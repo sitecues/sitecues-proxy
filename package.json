@@ -1,0 +1,39 @@
+{
+  "name": "sitecues-proxy",
+  "version": "0.0.1",
+  "description": "A proxy service designed enable webpages with sitecues.",
+  "author": "Seth Holladay",
+  "homepage": "https://www.sitecues.com",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:ai_squared/sitecues-proxy.git"
+  },
+  "main": "source/js/sitecues-qa.js",
+  "devDependencies": {
+    "grunt-cli": "0.1.13",
+    "grunt": "0.4.5",
+    "grunt-contrib-clean": "0.6.0",
+    "grunt-jsonlint": "1.0.4",
+    "grunt-contrib-jshint": "0.10.0",
+    "grunt-jscs": "0.6.2",
+    "grunt-jslint": "1.1.12",
+    "selenium-server": "2.38.0",
+    "grunt-selenium-webdriver": "0.2.422",
+    "intern": "2.0.1",
+    "grunt-contrib-concat": "0.5.0",
+    "grunt-contrib-uglify": "0.5.0",
+    "harmon": "0.3.1",
+    "connect": "2.14.4",
+    "http-proxy": "1.1.2",
+    "grunt-contrib-watch": "0.6.1"
+  },
+  "scripts": {
+    "test": "grunt clean lint test"
+  },
+  "license": "BSD-2-Clause",
+  "keywords": [
+    "sitecues",
+    "proxy",
+    "service"
+  ]
+}
