@@ -22,8 +22,8 @@
     "intern": "2.0.1",
     "grunt-contrib-concat": "0.5.0",
     "grunt-contrib-uglify": "0.5.0",
+    "express": "4.9.0",
     "harmon": "0.3.1",
-    "connect": "2.14.4",
     "http-proxy": "1.1.2",
     "grunt-contrib-watch": "0.6.1"
   },
