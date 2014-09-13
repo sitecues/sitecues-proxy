@@ -1,17 +1,24 @@
+// This is the main entry point to our application,
+// running it with node will start it up.
+
 'use strict';
 
+// Get instances of packages we depend on
+// and set up internal variables...
 var http          = require('http'),
-    connect       = require('connect'),
+    express       = require('express'),
     httpProxy     = require('http-proxy'),
-    modifications = [],
+    modifications = [],  // list of all changes we are making to documents
     enable        = {},
     message       = {},
-    proxy,
-    server,
-    app,
-    page,
-    loadScript,
-    tagline;
+    proxy, //
+    server, // the origin server for documents, for proof of concept purposes
+    app, // will be the initialized instance of Express
+    page, // a fake page, solely for proof of concept purposes
+    loadScript, // the load script for sitecues the proxy will inject
+    tagline, // a visual change, to verify proxy behavior
+    port       = process.env.PORT || 8000, // set the proxy port number
+    serverPort = process.env.SERVERPORT || 9000; // set the basic HTTP server port number
 
 page = '' +
     '<!DOCTYPE html>\n'                +
@@ -63,24 +70,32 @@ modifications.push(enable, message);
 
 proxy = httpProxy.createProxyServer(
     {
-        target: 'http://localhost:9000'
+        target: 'http://127.0.0.1:' + serverPort
     }
 );
 
 //
-// Basic Connect App
+// Set up our Express app
 //
-app = connect();
+app = express();
 
+// Make the Express app use the desired middleware...
 app.use(require('harmon')([], modifications));
 app.use(
     function (req, res) {
         proxy.web(req, res);
     }
 );
-app.listen(8000);
 
-// Server for the original content...
+// START THE PROXY
+// =============================================================================
+app.listen(port);
+console.log('The sitecues® proxy is on port ' + port + '.');
+
+
+// CREATE THE SERVER
+// =============================================================================
+// Make a basic HTTP server for the original content...
 server = http.createServer(
     function (req, res) {
         res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -88,4 +103,8 @@ server = http.createServer(
         res.end();
     }
 );
-server.listen(9000);
+
+// START THE SERVER
+// =============================================================================
+server.listen(serverPort);
+console.log('A basic HTTP server is on port ' + serverPort + '.');
