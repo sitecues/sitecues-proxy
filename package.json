@@ -8,7 +8,7 @@
     "type": "git",
     "url": "git@bitbucket.org:ai_squared/sitecues-proxy.git"
   },
-  "main": "source/js/sitecues-qa.js",
+  "main": "source/app.js",
   "devDependencies": {
     "grunt-cli": "0.1.13",
     "grunt": "0.4.5",

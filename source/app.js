@@ -7,6 +7,7 @@
 // and set up internal variables...
 var http          = require('http'),
     express       = require('express'),
+    harmon        = require('harmon'),
     httpProxy     = require('http-proxy'),
     portscanner   = require('portscanner'),
     modifications = [],  // list of all changes we are making to documents
@@ -65,6 +66,9 @@ tagline = 'brought to you by sitecues&reg;';
 
 function sanitizePort(data, min, max, fallback) {
 
+    // This function is designed to be a re-usable API to get
+    // a sensible port number, based on user input
+
     var fallbackType = typeof fallback,
         validFallbacks = [
             'string',
@@ -74,13 +78,13 @@ function sanitizePort(data, min, max, fallback) {
         dataInt = parseInt(data, 10), // either an integer or NaN
         result;
 
-    data = dataInt >= 0 ? dataInt : data, // avoid NaN and modify to the integer form, if possible
-    min  = parseInt(min, 10); // NaN is good here because of how we use > and < later
-    max  = parseInt(max, 10); // NaN is good here because of how we use > and < later
+    data = dataInt >= 0 ? dataInt : data, // use integer, if possible, otherwise leave alone for logging purposes
+    min  = parseInt(min, 10); // NaN is fine here because of how we use > and < later
+    max  = parseInt(max, 10); // NaN is fine here because of how we use > and < later
 
     // make sure the fallback is a supported type...
     if (validFallbacks.indexOf(fallbackType) >= 0) {
-        // make sure its not an empty string...
+        // make sure it's not an empty string...
         if (fallbackType === 'string' && fallback.length) {
             // try to extract a number...
             fallback = parseInt(fallback, 10);
@@ -118,6 +122,7 @@ function sanitizePort(data, min, max, fallback) {
     return result;
 }
 
+// describe page changes...
 enable.query = 'head'; // CSS selector to match
 enable.func = function (node) {
     node.createWriteStream().end(loadScript);
@@ -127,21 +132,16 @@ message.func = function (node) {
     node.createWriteStream().end(tagline);
 };
 
+// register all of the page changes we want to make...
 modifications.push(enable, message);
 
-proxy = httpProxy.createProxyServer(
-    {
-        target: 'http://' + host + ':' + serverPort
-    }
-);
-
-//
-// Set up our Express app
-//
+// Set up our Express app...
 app = express();
 
 // Make the Express app use the desired middleware...
-app.use(require('harmon')([], modifications));
+app.use(
+    harmon([], modifications)
+);
 app.use(
     function (req, res) {
         proxy.web(req, res);
@@ -197,5 +197,11 @@ portscanner.findAPortNotInUse(serverPort, maxPort, host, function(error, foundPo
         server.listen(serverPort, function () {
             console.log('A basic HTTP server is on port ' + serverPort + '.');
         });
+
+        proxy = httpProxy.createProxyServer(
+            {
+                target: 'http://' + host + ':' + serverPort
+            }
+        );
     }
 });
