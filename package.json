@@ -25,6 +25,7 @@
     "express": "4.9.0",
     "harmon": "0.3.1",
     "http-proxy": "1.1.2",
+    "portscanner": "1.0.0",
     "grunt-contrib-watch": "0.6.1"
   },
   "scripts": {
