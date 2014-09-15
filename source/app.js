@@ -10,21 +10,22 @@ var http          = require('http'),
     harmon        = require('harmon'),
     httpProxy     = require('http-proxy'),
     portscanner   = require('portscanner'),
+    loadScript,   // the load script for sitecues, which the proxy will inject
+    tagline,      // a simple piece of text to display, to verify proxy behavior
+    enable        = {}, // represents changes to insert sitecues
+    message       = {}, // represents changes to some page text
     modifications = [],  // list of all changes we are making to documents
-    enable        = {},
-    message       = {},
-    proxy, //
-    server, // the origin server for documents, for proof of concept purposes
-    app, // will be the initialized instance of Express
-    page, // a fake page, solely for proof of concept purposes
-    loadScript, // the load script for sitecues the proxy will inject
-    tagline, // a visual change, to verify proxy behavior
-    host = process.env.HOST || '127.0.0.1',
-    minPort    = 1024, // anything less than 1024 needs sudo on *nix and OS X
-    maxPort    = 65535, // most systems will not accept anything greater than 65535
-    defaultPort = 8000,
-    defaultServerPort = defaultPort + 1000,
-    port = sanitizePort(process.env.PORT, minPort, maxPort, defaultPort), // set the proxy port number we will attempt to use
+    proxy,      // configuration to enable proxy behavior
+    server,     // the origin server for documents, for proof of concept purposes
+    app,        // the Express server launched to host the proxy
+    page,       // a fake page, solely for proof of concept purposes
+    verbose     = process.env.VERBOSE,
+    host        = process.env.HOST || '127.0.0.1',
+    minPort     = 1024,  // anything less than 1024 needs sudo on *nix and OS X
+    maxPort     = 65535, // most systems will not accept anything greater than 65535
+    defaultPort = 8000,  // port for the proxy if none is provided
+    defaultServerPort = defaultPort - 1000, // port for the server if none is provided
+    port       = sanitizePort(process.env.PORT, minPort, maxPort, defaultPort), // set the proxy port number we will attempt to use
     serverPort = sanitizePort(process.env.SERVERPORT, minPort, maxPort, defaultServerPort); // set the basic HTTP server port number we will attempt to use
 
 page = '' +
@@ -100,7 +101,7 @@ function sanitizePort(data, min, max, fallback) {
 
     // ports are allowed to exactly equal min or max, otherwise they
     // must be truthy AND be between min and max...
-    if ((data === min || data === max) || (data && data > min && data < max)) {
+    if (data === min || data === max || (data && data > min && max > data)) {
         result = data;
     }
     else {
@@ -111,7 +112,7 @@ function sanitizePort(data, min, max, fallback) {
             result = fallback;
         }
         // logging the following is annoying if data is undefined, etc...
-        if (dataInt >= 0) {
+        if (dataInt >= 0 || verbose) {
             console.log(
                 'Port ' + data + ' is not in the desired range of ' + min + '-' + max +
                 '. Attempting to use ' + result + ' instead.'
@@ -148,27 +149,6 @@ app.use(
     }
 );
 
-// START THE PROXY
-// =============================================================================
-// asynchronously find an available port in the given range...
-portscanner.findAPortNotInUse(port, maxPort, host, function(error, foundPort) {
-    if (error) {
-        console.error('Port scanner error... ' + error);
-    }
-    else {
-        if (foundPort !== port) {
-            console.log(
-                'Port ' + port + ' is not available. Using ' + foundPort +
-                ' instead, which is the next one free.'
-            );
-        }
-        port = foundPort;
-        app.listen(port, function () {
-            console.log('The sitecues® proxy is on port ' + port + '.');
-        });
-    }
-});
-
 // CREATE THE SERVER
 // =============================================================================
 // Make a basic HTTP server for the original content...
@@ -180,9 +160,11 @@ server = http.createServer(
     }
 );
 
-// START THE SERVER
-// =============================================================================
-portscanner.findAPortNotInUse(serverPort, maxPort, host, function(error, foundPort) {
+function launchServerAndProxy(error, foundPort) {
+
+    // This function is designed to ensure that the server and
+    // proxy are asynchronously started in the proper order
+
     if (error) {
         console.error('Port scanner error... ' + error);
     }
@@ -203,5 +185,28 @@ portscanner.findAPortNotInUse(serverPort, maxPort, host, function(error, foundPo
                 target: 'http://' + host + ':' + serverPort
             }
         );
+
+        // asynchronously find an available port in the given range...
+        portscanner.findAPortNotInUse(port, maxPort, host, function(error, foundPort) {
+            if (error) {
+                console.error('Port scanner error... ' + error);
+            }
+            else {
+                if (foundPort !== port) {
+                    console.log(
+                        'Port ' + port + ' is not available. Using ' + foundPort +
+                        ' instead, which is the next one free.'
+                    );
+                }
+                port = foundPort;
+                app.listen(port, function () {
+                    console.log('The sitecues® proxy is on port ' + port + '.');
+                });
+            }
+        });
     }
-});
+}
+
+// LAUNCH THE SERVER AND PROXY
+// =============================================================================
+portscanner.findAPortNotInUse(serverPort, maxPort, host, launchServerAndProxy);
