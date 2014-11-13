@@ -12,9 +12,7 @@ var http          = require('http'),
     portscanner   = require('portscanner'),
     loadScript,   // the load script for sitecues, which the proxy will inject
     tagline,      // a simple piece of text to display, to verify proxy behavior
-    enable        = {}, // represents changes to insert sitecues
-    message       = {}, // represents changes to some page text
-    modifications = [],  // list of all changes we are making to documents
+    modifications = [], // list of all changes we are making to documents
     proxy,      // configuration to enable proxy behavior
     server,     // the origin server for documents, for proof of concept purposes
     app,        // the Express server launched to host the proxy
@@ -123,18 +121,21 @@ function sanitizePort(data, min, max, fallback) {
     return result;
 }
 
-// describe page changes...
-enable.query = 'head'; // CSS selector to match
-enable.func = function (node) {
-    node.createWriteStream().end(loadScript);
-};
-message.query = '.desc'; // CSS selector to match
-message.func = function (node) {
-    node.createWriteStream().end(tagline);
-};
-
 // register all of the page changes we want to make...
-modifications.push(enable, message);
+modifications = [
+    {
+        query : 'head',  // CSS selector to match
+        func  : function (node) {  // what to do with it, when found
+            node.createWriteStream().end(loadScript); // inject the load script into the DOM node
+        }
+    },
+    {
+        query : '.desc',
+        func  : function (node) {
+            node.createWriteStream().end(tagline); // write the tagline to the DOM node
+        }
+    }
+]
 
 // Set up our Express app...
 app = express();
@@ -187,7 +188,7 @@ function launchServerAndProxy(error, foundPort) {
         );
 
         // asynchronously find an available port in the given range...
-        portscanner.findAPortNotInUse(port, maxPort, host, function(error, foundPort) {
+        portscanner.findAPortNotInUse(port, maxPort, host, function (error, foundPort) {
             if (error) {
                 console.error('Port scanner error... ' + error);
             }
