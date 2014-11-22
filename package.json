@@ -10,7 +10,8 @@
   },
   "main": "source/app.js",
   "dependencies": {
-    "hoxy": "^1.2.0"
+    "portscanner": "1.0.0",
+    "hoxy": "1.2.1"
   },
   "devDependencies": {
     "grunt-cli": "0.1.13",
@@ -20,8 +21,6 @@
     "grunt-contrib-jshint": "0.10.0",
     "grunt-jscs": "0.8.1",
     "grunt-jslint": "1.1.12",
-    "portscanner": "1.0.0",
-    "hoxy": "1.2.1",
     "grunt-selenium-webdriver": "0.2.431",
     "intern": "2.1.1",
     "grunt-contrib-watch": "0.6.1"
