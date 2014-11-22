@@ -5,44 +5,22 @@
 
 // Get instances of packages we depend on
 // and set up internal variables...
-var http          = require('http'),
-    express       = require('express'),
-    harmon        = require('harmon'),
-    httpProxy     = require('http-proxy'),
-    portscanner   = require('portscanner'),
-    loadScript,   // the load script for sitecues, which the proxy will inject
-    tagline,      // a simple piece of text to display, to verify proxy behavior
-    modifications = [], // list of all changes we are making to documents
-    proxy,      // configuration to enable proxy behavior
-    server,     // the origin server for documents, for proof of concept purposes
-    app,        // the Express server launched to host the proxy
-    page,       // a fake page, solely for proof of concept purposes
+var portscanner = require('portscanner'), // utility to find available ports
+    http        = require('http'),        // utility to create a debugging server
+    hoxy        = require('hoxy'),        // utility to create the actual proxy
+    loadScript,  // the load script for sitecues, which the proxy will insert
+    proxy,       // represents the server to connect to for sitecues testing
+    proxyUrl,    // the absolute URL of the proxy, which cannot be known until runtime
+    contentRoot = 'http://www.example.com',
     verbose     = process.env.VERBOSE,
-    host        = process.env.HOST || '127.0.0.1',
+    hostname    = process.env.HOSTNAME || '127.0.0.1',
     minPort     = 1024,  // anything less than 1024 needs sudo on *nix and OS X
     maxPort     = 65535, // most systems will not accept anything greater than 65535
     defaultPort = 8000,  // port for the proxy if none is provided
-    defaultServerPort = defaultPort - 1000, // port for the server if none is provided
-    port       = sanitizePort(process.env.PORT, minPort, maxPort, defaultPort), // set the proxy port number we will attempt to use
-    serverPort = sanitizePort(process.env.SERVERPORT, minPort, maxPort, defaultServerPort); // set the basic HTTP server port number we will attempt to use
-
-page = '' +
-    '<!DOCTYPE html>\n'                +
-    '<html>\n'                         +
-    '    <head>\n'                     +
-    '    </head>\n'                    +
-    '    <body>\n'                     +
-    '        <div class=\"intro\">\n'  +
-    '            Future Aweseomness\n' +
-    '        </div>\n'                 +
-    '        <div class=\"desc\">\n'   +
-    '            blah\n'               +
-    '        </div>\n'                 +
-    '    </body>\n'                    +
-    '</html>';
+    port        = sanitizePort(process.env.PORT, minPort, maxPort, defaultPort), // set the proxy port number we will attempt to use
 
 loadScript = '' +
-    '\n        <script data-provider=\"sitecues\" type=\"text/javascript\">\n'    +
+    '\n        <script data-provider=\"sitecues-proxy\" type=\"text/javascript\">\n'    +
     '            // DO NOT MODIFY THIS SCRIPT WITHOUT ASSISTANCE FROM SITECUES\n' +
     '            var sitecues = window.sitecues || {};\n\n'                       +
     '            sitecues.config = {\n'                                           +
@@ -52,16 +30,14 @@ loadScript = '' +
     '                var script = document.createElement(\'script\'),\n'          +
     '                first = document.getElementsByTagName(\'script\')[0];\n'     +
     '                sitecues.config.script_url=document.location.protocol+'      +
-                         '\'//js.sitecues.com/l/s;id=\'+sitecues.config.site_id+' +
-                         '\'/js/sitecues.js\';\n'                                 +
+                         '\'//js.dev.sitecues.com/l/s;id=\'+sitecues.config.site_id+' +
+                         '\'/v/dev/latest/js/sitecues.js\';\n'                                 +
     '                script.type = \'text/javascript\';\n'                        +
     '                script.async = true;\n'                                      +
     '                script.src=sitecues.config.script_url;\n'                    +
     '                first.parentNode.insertBefore(script, first);\n'             +
     '            })();\n'                                                         +
     '        </script>\n    ';
-
-tagline = 'brought to you by sitecues&reg;';
 
 function sanitizePort(data, min, max, fallback) {
 
@@ -121,93 +97,105 @@ function sanitizePort(data, min, max, fallback) {
     return result;
 }
 
-// register all of the page changes we want to make...
-modifications = [
-    {
-        query : 'head',  // CSS selector to match
-        func  : function (node) {  // what to do with it, when found
-            node.createWriteStream().end(loadScript); // inject the load script into the DOM node
-        }
-    },
-    {
-        query : '.desc',
-        func  : function (node) {
-            node.createWriteStream().end(tagline); // write the tagline to the DOM node
-        }
-    }
-]
+function startProxy(error, foundPort) {
 
-// Set up our Express app...
-app = express();
+    // This function takes all steps necessary to initialize the proxy.
 
-// Make the Express app use the desired middleware...
-app.use(
-    harmon([], modifications)
-);
-app.use(
-    function (req, res) {
-        proxy.web(req, res);
-    }
-);
-
-// CREATE THE SERVER
-// =============================================================================
-// Make a basic HTTP server for the original content...
-server = http.createServer(
-    function (req, res) {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.write(page);
-        res.end();
-    }
-);
-
-function launchServerAndProxy(error, foundPort) {
-
-    // This function is designed to ensure that the server and
-    // proxy are asynchronously started in the proper order
+    var infoTimes = 0; // counter to ignore first info log from proxy
 
     if (error) {
-        console.error('Port scanner error... ' + error);
+        console.error('Port scanner error...', error);
     }
     else {
-        if (foundPort !== serverPort) {
+        if (foundPort !== port) {
             console.log(
-                'Port ' + serverPort + ' is not available. Using ' + foundPort +
+                'Port ' + port + ' is not available. Using ' + foundPort +
                 ' instead, which is the next one free.'
             );
         }
-        serverPort = foundPort;
-        server.listen(serverPort, function () {
-            console.log('A basic HTTP server is on port ' + serverPort + '.');
-        });
+        port     = foundPort;
+        proxyUrl = 'http://' + hostname + ':' + port;
 
-        proxy = httpProxy.createProxyServer(
+        proxy = new hoxy.Proxy(
             {
-                target: 'http://' + host + ':' + serverPort
+                reverse: contentRoot
             }
         );
 
-        // asynchronously find an available port in the given range...
-        portscanner.findAPortNotInUse(port, maxPort, host, function (error, foundPort) {
-            if (error) {
-                console.error('Port scanner error... ' + error);
-            }
-            else {
-                if (foundPort !== port) {
-                    console.log(
-                        'Port ' + port + ' is not available. Using ' + foundPort +
-                        ' instead, which is the next one free.'
-                    );
-                }
-                port = foundPort;
-                app.listen(port, function () {
-                    console.log('The sitecues® proxy is on port ' + port + '.');
-                });
+        proxy.log('error warn debug', function (event) {
+            console.log(event);
+            console.error(
+                event.level[0].toUpperCase() + event.level.slice(1) + ': ' +
+                event.message[0].toUpperCase() + event.message.slice(1)
+            );
+            if (event.error) {
+                console.error(event.error.stack);
             }
         });
+        proxy.log('info', function (event) {
+            // ignore the first info log, which shows listening port (we do it ourselves)
+            if (infoTimes > 0) {
+                console.log(event.level + ': ' + event.message);
+            }
+            infoTimes = infoTimes + 1;
+        });
+
+        proxy.intercept(
+            {
+                phase    : 'request',  // run before we send anything to the target server
+                protocol : /^https?/   // only run if using HTTP(S)
+            },
+            function (req, resp) {
+                console.log('proxyURL:', proxyUrl);
+                console.log('req.url:', req.url);
+                console.log('req.url.slice(1):', req.url.slice(1));
+                console.log('req.fullUrl:', req.fullUrl());
+                // if it is an absolute link, redirect traffic to the URL given in the path......
+                if (req.url.indexOf('http://') === 1 || req.url.indexOf('https://') === 1) {
+                    console.log('Truthy!');
+                    req.fullUrl(req.url.slice(1));
+                }
+            }
+        );
+
+        proxy.intercept(
+            {
+                phase    : 'response',   // run before we send anything back to the client
+                as       : '$',          // ask for a cheerio object, to manipulate DOM
+                mimeType : 'text/html',  // only run if response is HTML
+                protocol : /^https?/     // only run if using HTTP(S)
+            },
+            function (req, resp) {
+                // rules for images with a src attribute...
+                resp.$('img[src]').attr('src', function (index, value) {
+                    if (value.length > 0) {
+                        // bypass the proxy entirely for downloading images...
+                        return req.fullUrl() + value;
+                    }
+                });
+                // rules for anything with an href attribute...
+                resp.$('*[href]').attr('href', function (index, value) {
+                    if (value.length > 0) {
+                        // force proxying of links, etc.
+                        return proxyUrl + '/' + value;
+                    }
+                });
+                // Remove any existing sitecues load scripts, to avoid conflicts...
+                resp.$('script[data-provider="sitecues"]').remove();
+                // Inject our desired sitecues load script...
+                resp.$('head').eq(0).append(loadScript);
+            }
+        );
+
+        proxy.listen(port, function () {
+            console.log('The sitecues® proxy is on port ' + port + '.');
+        });
+        // TODO: Get local changes to proxy.close() merged upstream,
+        //       to log messages and be consistent with .listen()
     }
 }
 
-// LAUNCH THE SERVER AND PROXY
+// LAUNCH THE PROXY
 // =============================================================================
-portscanner.findAPortNotInUse(serverPort, maxPort, host, launchServerAndProxy);
+// asynchronously find an available port in the given range...
+portscanner.findAPortNotInUse(port, maxPort, hostname, startProxy);
