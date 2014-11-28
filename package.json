@@ -11,7 +11,8 @@
   "main": "source/app.js",
   "dependencies": {
     "portscanner": "1.0.0",
-    "hoxy": "1.2.1"
+    "hoxy": "1.2.1",
+    "forever": "0.13.0"
   },
   "devDependencies": {
     "grunt-cli": "0.1.13",
