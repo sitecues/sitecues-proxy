@@ -131,7 +131,7 @@ function startProxy(error, foundPort) {
                 protocol : /^https?/   // only run if using HTTP(S)
             },
             function (req, resp) {
-                // // if it is a sitecues domain...
+                // if it is a sitecues domain...
                 if (req.hostname.indexOf('sitecues') >= 0) {
                     // send a header indicating that this is a test session...
                     req.headers[testFlagName] = testFlagValue;
@@ -147,10 +147,13 @@ function startProxy(error, foundPort) {
                 protocol : /^https?/     // only run if using HTTP(S)
             },
             function (req, resp) {
-                // Remove any existing sitecues load scripts, to avoid conflicts...
-                resp.$('script[data-provider="sitecues"]').remove();
-                // Inject our desired sitecues load script...
-                resp.$('head').eq(0).append(loadScript);
+                // Decide whether configuration allows us to modify this page...
+                if (util.isEligible(req)) {
+                    // Remove any existing sitecues load scripts, to avoid conflicts...
+                    resp.$('script[data-provider="sitecues"]').remove();
+                    // Inject our desired sitecues load script...
+                    resp.$('head').eq(0).append(loadScript);
+                }
             }
         );
 
