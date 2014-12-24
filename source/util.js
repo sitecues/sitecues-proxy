@@ -1,7 +1,7 @@
 //
 // This module contains utilities for use by the sitecues proxy.
 // They may not all be used in production.
-// 
+//
 
 var whitelist         = require('./whitelist'),
     blacklist         = require('./blacklist'),
@@ -10,7 +10,8 @@ var whitelist         = require('./whitelist'),
     requiredConfig,
     secureProtocolMap,
     protocolPortMap,
-    log = console;
+    log = console,
+    defaultPort   = 8000;  // port for the proxy if none is provided
 
 log.ok = log.log;
 
@@ -25,7 +26,7 @@ defaultConfig = {
     route        : 'l',
     siteIdPrefix : 's;id=',
     siteId       : 's-00000005',           // Site ID designated for internal testing with IVONA speech
-    directory    : 'v',                    // base path to find the 
+    directory    : 'v',                    // base path to find the
     branch       : 'dev',
     version      : 'latest',
     file         : 'sitecues.js',
@@ -82,15 +83,108 @@ function isTrue(input) {
 
     // Boolean deserialization...
 
-    var trueValues = [
+    var choices = [
         true,
         'true',
         'yes',
         'on'
     ];
 
-    return input ? trueValues.indexOf(input.toLowerCase ? input.toLowerCase() : input) >= 0 : false;
+    return input ? choices.indexOf(typeof input.toLowerCase === 'function' ? input.toLowerCase() : input) >= 0 : false;
 }
+
+function isFalse(input) {
+
+    // Boolean deserialization...
+
+    var choices = [
+        false,
+        'false',
+        'no',
+        'off'
+    ];
+
+    // normalize...
+    if (input && typeof input.toLowerCase === 'function') {
+        input = input.toLowerCase();
+    }
+
+    return choices.indexOf(input) >= 0 || false;
+}
+
+function getPolarity(input) {
+
+    var result;  // default is undefined
+
+    if (isTrue(input)) {
+        result = true;
+    }
+    else if (isFalse(input)) {
+        result = false;
+    }
+
+    return result;
+}
+
+
+
+function sanitizePort(data, min, max, fallback) {
+
+    // This function is designed to be a re-usable API to get
+    // a sensible port number, based on user input
+
+    var fallbackType = typeof fallback,
+        validFallbackTypes = [
+            'string',
+            'number',
+            'function'
+        ],
+        dataInt = parseInt(data, 10), // either an integer or NaN
+        result;
+
+    data = dataInt >= 0 ? dataInt : data; // use integer, if possible, otherwise leave alone for logging purposes
+    min  = parseInt(min, 10); // NaN is fine here because of how we use > and < later
+    max  = parseInt(max, 10); // NaN is fine here because of how we use > and < later
+
+    // make sure the fallback is a supported type...
+    if (validFallbackTypes.indexOf(fallbackType) >= 0) {
+        if (fallbackType === 'string') {
+            // try to extract a number...
+            fallback = parseInt(fallback, 10);
+            // check if it came back as NaN or +/-Infinity...
+            if (!isFinite(fallback)) {
+                fallback = defaultPort;
+            }
+        }
+    }
+    else {
+        fallback = defaultPort;
+    }
+
+    // ports are allowed to exactly equal min or max, otherwise they
+    // must be truthy AND be between min and max...
+    if (data === min || data === max || (data && min < data && data < max)) {
+        result = data;
+    }
+    else {
+        if (fallbackType === 'function') {
+            result = fallback(data, min, max);
+        }
+        else {
+            result = fallback;
+        }
+        // logging the following is annoying if data is undefined, etc...
+        if (dataInt >= 0 || verbose) {
+            console.log(
+                'Port ' + data + ' is not in the desired range of ' + min + '-' + max +
+                '. Attempting to use ' + result + ' instead.'
+            );
+        }
+    }
+
+    return result;
+}
+
 
 function getLoadScript() {
     var result =
@@ -342,10 +436,11 @@ function isEligible(req) {
         pattern, flags;
 
     list = whitelist;
-    for (i = 0, len = list.length; i < len; i = i + 1) {
+    len = list.length;
+    for (i = 0; i < len; i = i + 1) {
         entry    = list[i];
         pattern  = entry.url;
-        flags    = !entry.flags || entry.flags === 'false' ? undefined : typeof entry.flags === 'string' ? entry.flags : undefined;
+        flags    = entry.flags && typeof entry.flags === 'string' ? entry.flags : undefined;
         useRegex = typeof entry.regex === 'boolean' ? entry.regex : entry.regex === 'true' ? true : entry.regex === 'false' ? false : REGEX_BY_DEFAULT;
 
         if (pattern) {
@@ -356,10 +451,11 @@ function isEligible(req) {
     }
 
     list = blacklist;
-    for (i = 0, len = list.length; i < len; i = i + 1) {
+    len = list.length
+    for (i = 0; i < len; i = i + 1) {
         entry    = list[i];
         pattern  = entry.url;
-        flags    = !entry.flags || entry.flags === 'false' ? undefined : typeof entry.flags === 'string' ? entry.flags : undefined;
+        flags    = entry.flags && typeof entry.flags === 'string' ? entry.flags : undefined;
         useRegex = typeof entry.regex === 'boolean' ? entry.regex : entry.regex === 'true' ? true : entry.regex === 'false' ? false : REGEX_BY_DEFAULT;
 
         if (pattern) {
@@ -376,6 +472,7 @@ function isEligible(req) {
 
 module.exports = {
     // external API...
+    sanitizePort   : sanitizePort,
     getLoadScript  : getLoadScript,
     isTrue         : isTrue,
     getFileFormats : getFileFormats,
