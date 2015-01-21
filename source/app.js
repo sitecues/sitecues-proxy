@@ -16,28 +16,28 @@ var portscanner   = require('portscanner'), // utility to find available ports
     maxPort       = 65535, // most systems will not accept anything greater than 65535
     defaultPort   = 8000,  // port for the proxy if none is provided
     port          = util.sanitizePort(process.env.PORT, minPort, maxPort, defaultPort), // set the proxy port number we will attempt to use
-    testFlagName  = 'SITECUES.TEST', // HTTP header to send, indicating we are testing
-    testFlagValue = 'TRUE; QA PROXY', // HTTP header value to send, indicating what kind of testing this is
+    testFlagName  = 'SITECUES-TEST',  // all requests from this proxy to our own servers are flagged as a test session via this HTTP header
+    testFlagValue = 'TRUE; PROXY',    // the value for our test flag HTTP header, to isolate this app in metrics reports
     log           = util.log;
 
 function onRequest(request, response) {
 
-    // This function is run when the proxy receives a connection from a user trying
-    // to go to their desired website.
+    // This function is run when the proxy receives a connection to go fetch
+    // a piece of content on the web.
 
-    // if it is a sitecues domain...
+    // If connecting to a sitecues domain...
     if (request.hostname.indexOf('sitecues') >= 0) {
-        // send a header indicating that this is a test session...
+        // Send a header indicating that this is a test session...
         request.headers[testFlagName] = testFlagValue;
     }
 }
 
 function onResponse(request, response) {
 
-    // This function is run when the proxy is about to deliver
-    // the user's desired website back to them.
+    // This function is run when the proxy is about to deliver a piece of
+    // web content back to the user, based on a previous request.
 
-    // Decide whether configuration allows us to modify this page...
+    // Decide whether configuration allows us to modify this content...
     if (util.isEligible(request)) {
         // Remove any existing sitecues load scripts, to avoid conflicts...
         response.$('script[data-provider="sitecues"]').remove();
@@ -53,6 +53,9 @@ function onResponse(request, response) {
 }
 
 function onListening() {
+
+    // This function is run when the proxy is up and ready to accept connections.
+
     log.ok(
         'The sitecues® proxy is on port ' + port + '.'
     );
@@ -62,7 +65,7 @@ function startProxy(error, foundPort) {
 
     // This function takes all steps necessary to initialize the proxy.
 
-    var infoTimes = 0; // counter to ignore first info log from proxy
+    var infoTimes = 0;  // counter to ignore first info log from proxy
 
     if (error) {
         log.error(
