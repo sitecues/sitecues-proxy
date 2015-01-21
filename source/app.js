@@ -3,8 +3,8 @@
 
 'use strict';
 
-// Get instances of modules we depend on...
-// and set up internal variables...
+// Get instances of modules we depend on
+// and set up internal configuration...
 var portscanner   = require('portscanner'), // utility to find available ports
     hoxy          = require('hoxy'),        // utility to create the proxy
     util          = require('./util'),      // internal project utilities
@@ -17,7 +17,46 @@ var portscanner   = require('portscanner'), // utility to find available ports
     defaultPort   = 8000,  // port for the proxy if none is provided
     port          = util.sanitizePort(process.env.PORT, minPort, maxPort, defaultPort), // set the proxy port number we will attempt to use
     testFlagName  = 'SITECUES.TEST', // HTTP header to send, indicating we are testing
-    testFlagValue = 'TRUE; QA PROXY'; // HTTP header value to send, indicating what kind of testing this is
+    testFlagValue = 'TRUE; QA PROXY', // HTTP header value to send, indicating what kind of testing this is
+    log           = util.log;
+
+function onRequest(request, response) {
+
+    // This function is run when the proxy receives a connection from a user trying
+    // to go to their desired website.
+
+    // if it is a sitecues domain...
+    if (request.hostname.indexOf('sitecues') >= 0) {
+        // send a header indicating that this is a test session...
+        request.headers[testFlagName] = testFlagValue;
+    }
+}
+
+function onResponse(request, response) {
+
+    // This function is run when the proxy is about to deliver
+    // the user's desired website back to them.
+
+    // Decide whether configuration allows us to modify this page...
+    if (util.isEligible(request)) {
+        // Remove any existing sitecues load scripts, to avoid conflicts...
+        response.$('script[data-provider="sitecues"]').remove();
+        // Inject our desired sitecues load script...
+        response.$('head').eq(0).append(loadScript);
+    }
+    else {
+        log.warn(
+            'An ineligible site was accessed:\n',
+            request.fullUrl()
+        );
+    }
+}
+
+function onListening() {
+    log.ok(
+        'The sitecues® proxy is on port ' + port + '.'
+    );
+}
 
 function startProxy(error, foundPort) {
 
@@ -26,15 +65,13 @@ function startProxy(error, foundPort) {
     var infoTimes = 0; // counter to ignore first info log from proxy
 
     if (error) {
-        console.error(
-            new Date().toISOString(),
+        log.error(
             'Port scanner error...', error
         );
     }
     else {
         if (foundPort !== port) {
-            console.log(
-                new Date().toISOString(),
+            log.warn(
                 'Port ' + port + ' is not available. Using ' + foundPort +
                 ' instead, which is the next one free.'
             );
@@ -44,21 +81,19 @@ function startProxy(error, foundPort) {
         proxy = new hoxy.Proxy();
 
         proxy.log('error warn debug', function (event) {
-            console.error(
-                new Date().toISOString(),
+            log.error(
                 event.level[0].toUpperCase() + event.level.slice(1) + ': ' +
                 event.message[0].toUpperCase() + event.message.slice(1)
             );
             if (event.error) {
-                console.error(event.error.stack);
+                log.error(event.error.stack);
             }
         });
         proxy.log('info', function (event) {
             // ignore the first info log, which shows the listening port
             // and therefor duplicates something we do ourselves
             if (infoTimes > 0) {
-                console.log(
-                    new Date().toISOString(),
+                log.info(
                     event.level + ': ' + event.message
                 );
             }
@@ -72,39 +107,24 @@ function startProxy(error, foundPort) {
                 phase    : 'request',  // run before we send anything to the target server
                 protocol : /^https?/   // only run if using HTTP(S)
             },
-            function (req, resp) {
-                // if it is a sitecues domain...
-                if (req.hostname.indexOf('sitecues') >= 0) {
-                    // send a header indicating that this is a test session...
-                    req.headers[testFlagName] = testFlagValue;
-                }
-            }
+            onRequest  // callback to be run when all of the above conditions are met
         );
 
         proxy.intercept(
             {
                 phase    : 'response',   // run before we send anything back to the client
-                as       : '$',          // ask for a cheerio object, to manipulate DOM
+                as       : '$',          // ask for a cheerio object, to manipulate the DOM
                 mimeType : 'text/html',  // only run if response is HTML
                 protocol : /^https?/     // only run if using HTTP(S)
             },
-            function (req, resp) {
-                // Decide whether configuration allows us to modify this page...
-                if (util.isEligible(req)) {
-                    // Remove any existing sitecues load scripts, to avoid conflicts...
-                    resp.$('script[data-provider="sitecues"]').remove();
-                    // Inject our desired sitecues load script...
-                    resp.$('head').eq(0).append(loadScript);
-                }
-            }
+            onResponse  // callback to be run when all of the above conditions are met
         );
 
-        proxy.listen(port, function () {
-            console.log(
-                new Date().toISOString(),
-                'The sitecues® proxy is on port ' + port + '.'
-            );
-        });
+        proxy.listen(
+            port,        // port to listen on
+            onListening  // callback to run when the proxy is ready for connections
+        );
+
         // TODO: Get local changes to proxy.close() merged upstream,
         //       to log messages and be consistent with .listen()
     }
