@@ -1,7 +1,10 @@
 //
 // This module contains utilities for use by the sitecues proxy.
-// They may not all be used in production.
 //
+
+// NOTE: At the moment, many of these are experiments. They are not all used, especially in production.
+
+// TODO: Clean up this module.
 
 var whitelist         = require('./whitelist'),
     blacklist         = require('./blacklist'),
@@ -10,10 +13,30 @@ var whitelist         = require('./whitelist'),
     requiredConfig,
     secureProtocolMap,
     protocolPortMap,
-    log = console,
-    defaultPort   = 8000;  // port for the proxy if none is provided
+    log = {},
+    defaultPort   = 8000,  // port for the proxy if none is provided
+    verbose = process.env.VERBOSE;
 
-log.ok = log.log;
+log.ok = function () {
+    // here we simply want to add a date string to the beginning of arguments
+    // and call console.log with that list
+
+    // sadly, this requires some trickery...
+    console.log.apply(console, [new Date().toISOString()].concat([].slice.call(arguments)));
+};
+log.warn = function () {
+    console.warn.apply(console, [new Date().toISOString()].concat([].slice.call(arguments)));
+};
+log.info = function () {
+    console.info.apply(console, [new Date().toISOString()].concat([].slice.call(arguments)));
+};
+log.error = function () {
+    console.error.apply(console, [new Date().toISOString()].concat([].slice.call(arguments)));
+};
+
+function doLog(strategy) {
+    console[strategy]
+}
 
 defaultConfig = {
     provider     : 'sitecues-proxy',       // identifier on the load script for which system created it
@@ -469,6 +492,31 @@ function isEligible(req) {
     return result;
 }
 
+function removeLoadScripts(origin) {
+
+    var originType = typeof origin,
+        matches,
+        selector = 'script[data-provider="sitecues"]';
+
+    if (originType === 'function') {
+        matches = origin(selector);
+    }
+    else if (origin && typeof origin.$ === 'function') {
+        matches = origin.$(selector);
+    }
+    else {
+        throw new Error('Unable to remove load script from given input.');
+    }
+
+    matches.remove();
+}
+
+function putSitecues(req, resp, loadScript) {
+    // Remove any existing sitecues load scripts, to avoid conflicts...
+    resp.$('script[data-provider="sitecues"]').remove();
+    // Inject our desired sitecues load script...
+    resp.$('head').eq(0).append(loadScript);
+}
 
 module.exports = {
     // external API...
@@ -476,5 +524,6 @@ module.exports = {
     getLoadScript  : getLoadScript,
     isTrue         : isTrue,
     getFileFormats : getFileFormats,
-    isEligible     : isEligible
+    isEligible     : isEligible,
+    log            : log
 };

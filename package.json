@@ -2,13 +2,23 @@
   "name": "sitecues-proxy",
   "version": "0.0.5",
   "description": "A proxy service designed to enable webpages with sitecues.",
-  "author": "Seth Holladay",
+  "author": {
+    "name": "Seth Holladay",
+    "email": "me@seth-holladay.com",
+    "url": "http://seth-holladay.com"
+  },
   "homepage": "https://www.sitecues.com",
   "repository": {
     "type": "git",
     "url": "git@bitbucket.org:ai_squared/sitecues-proxy.git"
   },
   "main": "source/app.js",
+  "private": true,
+  "engineStrict": true,
+  "engines": {
+      "node": "~0.10.32",
+      "npm": "~2.1.4"
+  },
   "dependencies": {
     "portscanner": "1.0.0",
     "hoxy": "1.2.1",
