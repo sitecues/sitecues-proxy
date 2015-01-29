@@ -2,12 +2,13 @@
   "name": "sitecues-proxy",
   "version": "0.0.5",
   "description": "A proxy service designed to enable webpages with sitecues.",
+  "homepage": "https://www.sitecues.com",
+  "license": "BSD-2-Clause",
   "author": {
     "name": "Seth Holladay",
     "email": "me@seth-holladay.com",
     "url": "http://seth-holladay.com"
   },
-  "homepage": "https://www.sitecues.com",
   "repository": {
     "type": "git",
     "url": "git@bitbucket.org:ai_squared/sitecues-proxy.git"
@@ -18,6 +19,20 @@
   "engines": {
     "node": "~0.10.32",
     "npm": "~2.1.4"
+  },
+  "preferGlobal": true,
+  "bin": {
+    "sitecues-proxy": "bin/sitecues-proxy.js"
+  },
+  "scripts": {
+    "start": "node .",
+    "test": "grunt clean lint test"
+  },
+  "directories": {
+    "doc": "./doc",
+    "man": "./man",
+    "lib": "./lib",
+    "bin": "./bin"
   },
   "dependencies": {
     "hoxy": "1.2.1",
@@ -36,11 +51,6 @@
     "intern": "2.1.1",
     "grunt-contrib-watch": "0.6.1"
   },
-  "scripts": {
-    "start": "node .",
-    "test": "grunt clean lint test"
-  },
-  "license": "BSD-2-Clause",
   "keywords": [
     "sitecues",
     "proxy",
