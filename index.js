@@ -7,9 +7,9 @@ function start(options) {
     defaultPorts.forward = 8000;
     defaultPorts.reverse = defaultPorts.forward + 1;
 
-    // TODO: Have the context path be the root of all proxy functionality, not just the page API.
-
-    options.contextPath = process.env.SITECUES_PROXY_CONTEXT_PATH || process.env.PROXY_CONTEXT_PATH || process.env.CONTEXT_PATH || '/foo/';
+    // Context path must begin and end with a slash '/'
+    // TODO: DRY up the slashes. Make robust helpers to compute proxy paths.
+    options.contextPath = process.env.SITECUES_PROXY_CONTEXT_PATH || process.env.PROXY_CONTEXT_PATH || process.env.CONTEXT_PATH || '/';
     options.hostname    = process.env.SITECUES_PROXY_HOSTNAME  || process.env.PROXY_HOSTNAME  || process.env.HOSTNAME  || '127.0.0.1';
     options.direction   = process.env.SITECUES_PROXY_DIRECTION || process.env.PROXY_DIRECTION || process.env.DIRECTION || 'forward';
     options.port        = process.env.SITECUES_PROXY_PORT      || process.env.PROXY_PORT      || process.env.PORT      || defaultPorts[options.direction.trim().toLowerCase()];
