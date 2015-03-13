@@ -1,3 +1,8 @@
+/**
+ * Starting point of all the packages.
+ * @type {exports}
+ */
+
 var lib = require('./lib');
 
 function start(options) {
