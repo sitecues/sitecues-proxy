@@ -2,5 +2,5 @@
 
 // This module defines the command line tool for this app.
 
-// The current architecture calls for simply starting from the main module.
+// Use the main module defined in the package.json manifest to spin up a proxy.
 require('../').start();
