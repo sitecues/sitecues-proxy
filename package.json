@@ -39,7 +39,8 @@
     "is-absolute-url": "1.0.0",
     "json-align": "^0.1.0",
     "pm2": "0.12.9",
-    "portscanner": "1.0.0"
+    "portscanner": "1.0.0",
+    "winston": "^0.9.0"
   },
   "devDependencies": {
     "grunt-cli": "0.1.13",
