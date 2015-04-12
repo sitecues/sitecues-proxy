@@ -35,6 +35,7 @@
     "bin": "./bin"
   },
   "dependencies": {
+    "dangit": "^0.1.2",
     "hoxy": "1.2.3",
     "is-absolute-url": "1.0.0",
     "json-align": "^0.1.0",
