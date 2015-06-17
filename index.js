@@ -3,6 +3,8 @@
 // At the moment, it serves as a config manager.
 //
 
+'use strict';
+
 var defaultPorts = require('./lib/default-ports'),
     lib          = require('./lib');
 
