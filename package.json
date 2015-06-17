@@ -34,11 +34,11 @@
     "bin": "./bin"
   },
   "dependencies": {
-    "dangit": "0.1.2",
+    "dangit": "0.2.3",
     "hoxy": "1.2.4",
     "is-absolute-url": "1.0.0",
     "json-align": "0.1.0",
-    "pm2": "0.12.10",
+    "pm2": "0.14.0",
     "portscanner": "1.0.0",
     "winston": "1.0.0"
   },
