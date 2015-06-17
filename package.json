@@ -15,10 +15,9 @@
   },
   "main": "index.js",
   "private": true,
-  "engineStrict": true,
   "engines": {
-    "node": "~0.10.35",
-    "npm": "~2.1.14"
+    "node": "~0.10.38",
+    "npm": "^2.11.2"
   },
   "preferGlobal": true,
   "bin": {
