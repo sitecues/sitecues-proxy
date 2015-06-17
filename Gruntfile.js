@@ -1,8 +1,8 @@
-module.exports = function (grunt) {
+'use strict';
 
-    'use strict';
+function taskRunner(grunt) {
 
-    // Project configuration.
+    // Task configuration.
     grunt.initConfig(
         {
             // Getting the full node app configuration as an object
@@ -265,3 +265,5 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['clean', 'lint', 'build', 'minify', 'test']);
 
 };
+
+module.exports = taskRunner;
