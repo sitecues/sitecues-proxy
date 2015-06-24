@@ -38,6 +38,7 @@
     "hoxy": "1.2.4",
     "is-absolute-url": "1.0.0",
     "json-align": "0.1.0",
+    "mkdirp": "^0.5.1",
     "pm2": "0.14.0",
     "portscanner": "1.0.0",
     "winston": "1.0.0"
