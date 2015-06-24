@@ -6,26 +6,27 @@ function taskRunner(grunt) {
     grunt.initConfig(
         {
             // Getting the full node app configuration as an object
-            // which can be used internally...
+            // which can be used internally.
             pkg : grunt.file.readJSON('package.json'),
 
-            // Clean configuration, used to whipe out temporary build data,
-            // for more robust and reliable builds...
+            // Clean configuration, used to wipe out temporary build data,
+            // for more robust and reliable builds.
             clean : {
                 // options : {
-                // //    'no-write': true // this does a dry-run, logs but no actual file deletion
+                // //    'no-write': true  // this does a dry-run (logs but no actual file deletion)
                 // },
                 normal : {
                     src : [
-                        'build' // directory created by the build process
+                        'report',  // directory created by the test system
+                        'log'      // directory created by the proxy at runtime
                     ]
                 }
             },
 
-            // JSONLint configuration, used for linting config files...
+            // JSONLint configuration, used for linting config files.
             jsonlint : {
                 normal : {
-                    // be explicit, globbing too much hurts build performance...
+                    // be explicit, globbing too much hurts build performance.
                     src : [
                         'package.json',
                         'config/**/*.json',
@@ -66,7 +67,7 @@ function taskRunner(grunt) {
                 },
                 grunt : {
                     // This target is intended to isolate the linting configuration
-                    // for the app's Gruntfile.js to only where it really matters...
+                    // for the app's Gruntfile.js to only where it really matters.
                     options : {
                         globals : {
                             module : false
@@ -78,7 +79,7 @@ function taskRunner(grunt) {
                 },
                 tests : {
                     // This target is intended to isolate the linting configuration
-                    // for the app's tests to only where it really matters...
+                    // for the app's tests to only where it really matters.
                     options : {
                         strict : false, // tests should be allowed to use non-strict APIs
                         globals : {
@@ -88,7 +89,7 @@ function taskRunner(grunt) {
                             sitecues : false  // used by the main library
                         },
                         // This tells JSHint to ignore the use of 'with' statements,
-                        // which we are okay with in our testing framework...
+                        // which we are okay with in our testing framework.
                         '-W085' : true
                     },
                     files : {
@@ -98,7 +99,7 @@ function taskRunner(grunt) {
                     }
                 },
                 js : {
-                    // This target is the main one, and affects most of the app...
+                    // This target is the main one, and affects most of the app.
                     files : {
                         src : [
                             'source/**/*.js'
@@ -107,7 +108,7 @@ function taskRunner(grunt) {
                 }
             },
 
-            // JSCS configuration, used for enforcing coding style requirements
+            // JSCS configuration, used for enforcing coding style requirements.
             jscs : {
                 options : {
                     config : 'config/code-style.json'
@@ -121,7 +122,7 @@ function taskRunner(grunt) {
                 },
                 tests : {
                     options : {
-                        disallowKeywords : null // tests are allowed to use 'with'
+                        disallowKeywords : null  // tests are allowed to use 'with'
                     },
                     files : {
                         src : [
@@ -138,14 +139,13 @@ function taskRunner(grunt) {
                 }
             },
 
-            // JSLint configuration, used for advice on code style
+            // JSLint configuration, used for advice on code style.
             jslint : {
                 js    : {
                     options : {
-                        // Version of JSLint to use...
-                        edition : 'latest' // most current by default
+                        // Version of JSLint to use.
+                        edition : 'latest'  // most current by default
                     },
-
                     files : {
                         src : [
                             'source/**/*.js'
@@ -159,39 +159,8 @@ function taskRunner(grunt) {
                     }
                 }
             },
-            concat : {
-                options : {
-                    banner : '(function () {\n\n',
-                    footer : '\n}());\n'
-                },
-                js : {
-                    nonull : true,  // log to console if we try to concat bad file paths
-                    src    : [
-                        'source/js/boilerplate.js',
-                        'source/js/private.js',
-                        'source/js/test.js',
-                        'source/js/public.js'
-                    ],
-                    dest   : 'build/js/<%= pkg.name %>.js'
-                }
-            },
 
-            // Uglify configuration, used for minifying and obfuscating the library...
-            uglify : {
-                options : {
-                    banner   : '/*! <%= pkg.name %>.js - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-                    compress         : false,   // optimize statements, for loops, etc.
-                    mangle           : false,   // shortens the names of functions and variables
-                    beautify         : true,  // whitespace is removed by default, set to true to undo that
-                    preserveComments : true   // keep comments like this
-                },
-                build : {
-                    src  : 'build/js/<%= pkg.name %>.js',
-                    dest : 'build/js/<%= pkg.name %>.min.js'
-                }
-            },
-
-            // Selenium configuration, used for the app's functional testing...
+            // Selenium configuration, used for the app's functional testing.
             selenium_start : {
                 // NOTE: This server is destroyed when grunt exits.
                 // You MUST chain this with other tasks.
@@ -200,7 +169,7 @@ function taskRunner(grunt) {
                 }
             },
 
-            // Intern configuration, used for the app's unit testing and functional testing...
+            // Intern configuration, used for the app's unit testing and functional testing.
             intern : {
                 options : {
                     config  : 'config/intern',  // path to the default, base configuration for the testing framework
@@ -216,16 +185,16 @@ function taskRunner(grunt) {
                 }
             },
 
-            // Selenium configuration, used for the app's functional testing...
+            // Selenium configuration, used for the app's functional testing.
             selenium_stop : {
                 options : { }
             },
 
             // Watch configuration, used for automatically executing
-            // tasks when saving files in the library...
+            // tasks when saving files in the library.
             watch : {
                 files : ['**.*'],
-                tasks : ['lint', 'build']
+                tasks : ['lint']
             }
         }
     );
@@ -239,10 +208,6 @@ function taskRunner(grunt) {
     grunt.loadNpmTasks('grunt-jscs');
     // Load the plugin that provides the "jslint" task.
     grunt.loadNpmTasks('grunt-jslint');
-    // Load the plugin that provides the "concat" task.
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    // Load the plugin that provides the "uglify" task.
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     // Load the plugin that provides the "start_selenium" and "start_selenium" tasks.
     grunt.loadNpmTasks('grunt-selenium-webdriver');
     // Load the plugin that provides the "intern" task.
@@ -254,15 +219,11 @@ function taskRunner(grunt) {
     grunt.registerTask('lint', ['jsonlint', 'jshint', 'jscs']);
     // Make a new task called 'opinion'.
     grunt.registerTask('opinion', ['lint', 'jslint']);
-    // Make a new task called 'build'.
-    grunt.registerTask('build', ['concat']);
-    // Make a new task called 'minify'.
-    grunt.registerTask('minify', ['uglify']);
     // Make a new task called 'test'.
     grunt.registerTask('test', ['selenium_start', 'intern:normal']);
 
     // Default task, will run if no task is specified.
-    grunt.registerTask('default', ['clean', 'lint', 'build', 'minify', 'test']);
+    grunt.registerTask('default', ['clean', 'lint', 'test']);
 
 };
 
