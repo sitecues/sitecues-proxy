@@ -173,7 +173,7 @@ function taskRunner(grunt) {
             intern : {
                 options : {
                     config  : 'config/intern',  // path to the default, base configuration for the testing framework
-                    runType : 'runner'          // runner means control browsers remotely, vs client, which is for unit testing
+                    runType : 'client'          // runner means control browsers remotely, vs client, which is for unit testing
                 },
                 normal : {
                     // empty target because it inherits task local options
