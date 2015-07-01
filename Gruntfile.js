@@ -1,3 +1,5 @@
+// This module defines the project's build system.
+
 'use strict';
 
 function taskRunner(grunt) {
@@ -13,7 +15,7 @@ function taskRunner(grunt) {
             // for more robust and reliable builds.
             clean : {
                 // options : {
-                // //    'no-write': true  // this does a dry-run (logs but no actual file deletion)
+                // //    'no-write': true  // dry run (logs but no actual changes)
                 // },
                 normal : {
                     src : [
@@ -31,7 +33,7 @@ function taskRunner(grunt) {
                         'package.json',
                         'config/**/*.json',
                         'test/**/*.json',
-                        'source/**/*.json'
+                        'lib/**/*.json'
                     ]
                 }
             },
@@ -41,68 +43,30 @@ function taskRunner(grunt) {
                 options : {
                     // Options here override JSHint defaults and are 'task local',
                     // meaning all targets in this task inherit these options...
-                    bitwise   : true,       // no bitwise - helps avoid mistyped && statements
-                    curly     : true,       // require curly braces when optional
-                    eqeqeq    : true,       // require strict equality checks (=== vs ==)
-                    es3       : true,       // adhere to EcmaScript 3 for old Internet Explorer
-                    freeze    : true,       // prohibits altering the prototype of native objects
-                    immed     : true,       // IIFEs must be wrapped in parentheses (function(){}())
-                    indent    : 4,          // NOT enforced - intended spaces-per-tab for better error messages
-                    latedef   : true,       // variables and functions must be declared before use
-                    newcap    : true,       // require capitalized constructor functions
-                    noarg     : true,       // prohibits using arguments.caller or arguments.callee
-                    noempty   : true,       // prohibits empty blocks of code
-                    nonbsp    : true,       // prohibits no-break spaces in source code (HTML entities are fine)
-                    nonew     : true,       // must assign objects from new Constructor() calls to a variable
-                    plusplus  : true,       // no using ++ or --
-                    quotmark  : 'single',   // must use single quotes for strings (easier to make bookmarks)
-                    undef     : true,       // cannot use undefined variables
-                    unused    : 'strict',   // don't allow variables to go unused
-                    strict    : true,       // all functions must be inside of a 'srtict mode' scope
-                    maxparams : 4,          // max number of parameters functions are allowed to have
-                    maxdepth  : 8,          // don't allow insane nesting of blocks
-                    // Relax, bro...
-                    node      : true,       // we will be in Node, with require and console.log, etc.
-                    devel     : true        // allow console, alert, etc.
+                    jshintrc : true  // look for config near each linted file
                 },
                 grunt : {
-                    // This target is intended to isolate the linting configuration
-                    // for the app's Gruntfile.js to only where it really matters.
-                    options : {
-                        globals : {
-                            module : false
-                        }
-                    },
+                    // This target knows how to lint the build system.
                     files : {
-                        src : ['Gruntfile.js']
+                        src : [
+                            'Gruntfile.js'
+                        ]
                     }
                 },
                 tests : {
-                    // This target is intended to isolate the linting configuration
-                    // for the app's tests to only where it really matters.
-                    options : {
-                        strict : false, // tests should be allowed to use non-strict APIs
-                        globals : {
-                            define   : false, // used by AMD modules
-                            suite    : false, // used by the testing framework
-                            test     : false, // used by the testing framework
-                            sitecues : false  // used by the main library
-                        },
-                        // This tells JSHint to ignore the use of 'with' statements,
-                        // which we are okay with in our testing framework.
-                        '-W085' : true
-                    },
+                    // This target knows how to lint the app's tests.
                     files : {
                         src : [
                             'test/**/*.js'
                         ]
                     }
                 },
-                js : {
-                    // This target is the main one, and affects most of the app.
+                lib : {
+                    // This target knows how to lint the primary app.
                     files : {
                         src : [
-                            'source/**/*.js'
+                            'lib/**/*.js',     // source directory JS files
+                            '<%= pkg.main %>'  // "main" defined in package.json
                         ]
                     }
                 }
@@ -111,7 +75,7 @@ function taskRunner(grunt) {
             // JSCS configuration, used for enforcing coding style requirements.
             jscs : {
                 options : {
-                    config : 'config/code-style.json'
+                    config : true
                 },
                 grunt : {
                     files : {
@@ -130,10 +94,10 @@ function taskRunner(grunt) {
                         ]
                     }
                 },
-                js    : {
+                lib : {
                     files : {
                         src : [
-                            'source/**/*.js'
+                            'lib/**/*.js'
                         ]
                     }
                 }
@@ -141,14 +105,14 @@ function taskRunner(grunt) {
 
             // JSLint configuration, used for advice on code style.
             jslint : {
-                js    : {
+                lib    : {
                     options : {
                         // Version of JSLint to use.
                         edition : 'latest'  // most current by default
                     },
                     files : {
                         src : [
-                            'source/**/*.js'
+                            'lib/**/*.js'
                         ]
                     },
                     directives : {
@@ -169,7 +133,7 @@ function taskRunner(grunt) {
                 }
             },
 
-            // Intern configuration, used for the app's unit testing and functional testing.
+            // Intern configuration, used for the app's automated tests.
             intern : {
                 options : {
                     config  : 'config/intern',  // path to the default, base configuration for the testing framework
