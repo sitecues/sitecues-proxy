@@ -15,7 +15,7 @@ function taskRunner(grunt) {
             // for more robust and reliable builds.
             clean : {
                 // options : {
-                // //    'no-write': true  // dry run (logs but no actual changes)
+                //     'no-write': true  // dry run (logs but no actual changes)
                 // },
                 normal : {
                     src : [
@@ -45,11 +45,12 @@ function taskRunner(grunt) {
                     // meaning all targets in this task inherit these options...
                     jshintrc : true  // look for config near each linted file
                 },
-                grunt : {
+                config : {
                     // This target knows how to lint the build system.
                     files : {
                         src : [
-                            'Gruntfile.js'
+                            'Gruntfile.js',   // build system
+                            'config/**/*.js'
                         ]
                     }
                 },
@@ -61,12 +62,13 @@ function taskRunner(grunt) {
                         ]
                     }
                 },
-                lib : {
+                app : {
                     // This target knows how to lint the primary app.
                     files : {
                         src : [
-                            'lib/**/*.js',     // source directory JS files
-                            '<%= pkg.main %>'  // "main" defined in package.json
+                            '<%= pkg.main %>',  // "main" defined in package.json
+                            'bin/**/*.js',      // CLI modules
+                            'lib/**/*.js'       // primary source files
                         ]
                     }
                 }
@@ -75,12 +77,13 @@ function taskRunner(grunt) {
             // JSCS configuration, used for enforcing coding style requirements.
             jscs : {
                 options : {
-                    config : true
+                    config : true  // look for config near each linted file
                 },
-                grunt : {
+                config : {
                     files : {
                         src : [
-                            'Gruntfile.js'
+                            'Gruntfile.js',
+                            'config/**/*.js'
                         ]
                     }
                 },
@@ -94,10 +97,12 @@ function taskRunner(grunt) {
                         ]
                     }
                 },
-                lib : {
+                app : {
                     files : {
                         src : [
-                            'lib/**/*.js'
+                            '<%= pkg.main %>',  // "main" defined in package.json
+                            'bin/**/*.js',      // CLI modules
+                            'lib/**/*.js'       // primary source files
                         ]
                     }
                 }
@@ -105,21 +110,19 @@ function taskRunner(grunt) {
 
             // JSLint configuration, used for advice on code style.
             jslint : {
-                lib    : {
-                    options : {
-                        // Version of JSLint to use.
-                        edition : 'latest'  // most current by default
-                    },
+                options : {
+                    // Version of JSLint to use.
+                    edition : 'latest'  // most current by default
+                },
+                app    : {
                     files : {
                         src : [
                             'lib/**/*.js'
                         ]
                     },
                     directives : {
-                        white   : true,  // JSLint disagrees with our whitespace conventions, tell it to quiet down.
-                        maxlen  : 140,   // Each line of code may not exceed this number of characters.
-                        browser : true,  // The library is intended for use in a browser, global variables like document are fine.
-                        devel   : true   // The library is intended to aid developers, use of APIs like the console is fine.
+                        white   : true,  // Be quiet about whitespace, we have JSCS.
+                        maxlen  : 80     // Max line length in characters.
                     }
                 }
             },
@@ -136,8 +139,8 @@ function taskRunner(grunt) {
             // Intern configuration, used for the app's automated tests.
             intern : {
                 options : {
-                    config  : 'config/intern',  // path to the default, base configuration for the testing framework
-                    runType : 'client'          // runner means control browsers remotely, vs client, which is for unit testing
+                    config  : 'config/intern',  // test framework config
+                    runType : 'client'          // unit testing mode
                 },
                 normal : {
                     // empty target because it inherits task local options
