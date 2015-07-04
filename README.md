@@ -6,24 +6,31 @@ A web server that sits between you and a website, to add or remove sitecues.
  - Code debugging
  - Quality assurance
 
-**Version**: `0.1.0`
-
-**Documentation**: [The sitecues&reg; Proxy](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=36241450)
+**Version**: `0.1.0`    
+**Documentation**: [The sitecues&reg; Proxy](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=36241450 "Documentation for the sitecues Proxy.")    
+**Author**: [Seth Holladay](http://seth-holladay.com "Personal website for Seth Holladay.")
 
 ## Installation
+
+Download the project.
 ````sh
 git clone git@bitbucket.org:ai_squared/sitecues-proxy.git
 ````
 
-For convenience, so that you can use the proxy from any directory, you probably want to put it in your $PATH.
+Move into its shiny new home.
+````sh
+cd sitecues-proxy
+````
+
+For convenience, so you may use the proxy from any directory, you probably want to put it in your [`$PATH`](http://www.linfo.org/path_env_var.html "Description of the PATH environment variable.").
 ````sh
 npm link
 ````
 
-Now you can run `sitecues-proxy` from anywhere on the command line. This is equivalent to `npm start`, except that only works inside of this project's directory, because that command is intentionally relative to the nearest package.json in or above the current working directory.
+Now you can run `sitecues-proxy` from anywhere on the command line. It is equivalent to `npm start` seen below, but that command only works inside of the project directory, because it is intentionally relative to the nearest [package.json](https://docs.nodejitsu.com/articles/getting-started/npm/what-is-the-file-package-json "Description of the package.json file.") in or above the current working directory.
 
 ## Usage
-Currently, all configuration at the command line is given through environment variables. Don't confuse these with arguments, they have different syntax and must be uppercase with underscores, like A_CONSTANT.
+At the moment, all settings on the command line are given via environment variables. Don't confuse these with arguments, they have different syntax and (by convention) must be uppercase with underscores, like `A_CONSTANT`.
 
 If using the proxy programmatically by `require()`ing it, then you may pass an options object with camelCase properties, which will take precedence.
 
@@ -83,9 +90,8 @@ Set the string used to identify customer sites.
 SITE_ID=0000ee0c npm start
 ````
 
-
 ## Contribution
-* Generally try to follow Crockford conventions.
+* Generally try to follow [Crockford conventions](http://javascript.crockford.com/code.html "Douglas Crockford's recommendations for JavaScript code style.").
 * Never commit directly to **master**.
 * Code must be reviewed by a previous contributor before pushing to or merging into **master**.
 * Must pass npm test before pushing to or merging into **master**.
@@ -99,4 +105,3 @@ SITE_ID=0000ee0c npm start
 [MPL-2.0](https://www.mozilla.org/MPL/2.0/ "The license for the sitecues Proxy.")
 
 Go make something, dang it.
-
