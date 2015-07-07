@@ -114,10 +114,27 @@ function taskRunner(grunt) {
                     // Version of JSLint to use.
                     edition : 'latest'  // most current by default
                 },
-                app    : {
+                config : {
                     files : {
                         src : [
-                            'lib/**/*.js'
+                            'Gruntfile.js',
+                            'config/**/*.js'
+                        ]
+                    }
+                },
+                tests : {
+                    files : {
+                        src : [
+                            'test/**/*.js'
+                        ]
+                    }
+                },
+                app : {
+                    files : {
+                        src : [
+                            '<%= pkg.main %>',  // "main" defined in package.json
+                            'bin/**/*.js',      // CLI modules
+                            'lib/**/*.js'       // primary source files
                         ]
                     },
                     directives : {
