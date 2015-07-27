@@ -1,6 +1,7 @@
 //
-// This is the main entry point for this application.
-// At the moment, it serves as a config manager.
+// This is the main entry point for the sitecues proxy.
+// It is a thin wrapper around the main library and is
+// responsible for setting defaults, so t serves as a config manager.
 //
 
 'use strict';
@@ -8,17 +9,26 @@
 var defaultPorts = require('./lib/default-ports'),
     lib          = require('./lib');
 
-function start(options) {
+function Server(options) {
 
-    if (!options || typeof options !== 'object') {
-        options = {};
+    // This is a thin wrapper around the main library's Server.
+    // It is responsible for sanitizing configuration, so that
+    // the main library can make more assumptions, and also so
+    // that this logic can be bypassed easily by using the
+    // main library directly, if you have a weird use case.
+
+    // Object.create is not happy with things like booleans, so override those.
+    if (typeof options !== 'object' && typeof options !== 'function') {
+        options = Object.prototype;
     }
+    // Make sure that we don't edit an object that does not belong to us.
+    options = Object.create(options);
 
-    // Context path must begin and end with a slash '/'
     options.hostname    = options.hostname    || process.env.SITECUES_PROXY_HOSTNAME     || process.env.PROXY_HOSTNAME     || process.env.HOSTNAME     || 'localhost';
     options.port        = options.port        || process.env.SITECUES_PROXY_PORT         || process.env.PROXY_PORT         || process.env.PORT         || defaultPorts[options.direction.trim().toLowerCase()];
     options.direction   = options.direction   || process.env.SITECUES_PROXY_DIRECTION    || process.env.PROXY_DIRECTION    || process.env.DIRECTION    || 'forward';
     options.target      = options.target      || process.env.SITECUES_PROXY_TARGET       || process.env.PROXY_TARGET       || process.env.TARGET       || 'http://www.example.com';
+    // NOTE: Context path must begin and end with a slash '/'
     options.contextPath = options.contextPath || process.env.SITECUES_PROXY_CONTEXT_PATH || process.env.PROXY_CONTEXT_PATH || process.env.CONTEXT_PATH || '/';
     options.proxyLinks  = options.proxyLinks  || process.env.SITECUES_PROXY_LINKS        || process.env.PROXY_LINKS        || process.env.LINKS        || false;
     options.verbose     = options.verbose     || process.env.SITECUES_PROXY_VERBOSE      || process.env.PROXY_VERBOSE      || process.env.VERBOSE      || false;
@@ -29,11 +39,23 @@ function start(options) {
     options.production  = options.production  || process.env.SITECUES_PROXY_PRODUCTION   || process.env.PROXY_PRODUCTION   || process.env.PRODUCTION   || false;
     options.ipAddress   = options.ipAddress   || process.env.SITECUES_PROXY_IP_ADDRESS   || process.env.PROXY_IP_ADDRESS   || process.env.IP_ADDRESS   || false;
 
+    // Delegate to the main library for all of the hard work
+    // of actually setting up a server.
+    lib.Server.call(this, options);
+}
+// Wrapper instance properties are the same as the main library's Server.
+Server.prototype = Object.create(lib.Server.prototype);
+// Make sure instances known their correct constructor.
+// If we don't, this will be the main library Server.
+Server.prototype.constructor = Server;
 
-    lib.start(options);
+function sitecuesProxy(options) {
+    return new Server(options);
 }
 
-module.exports = {
-    start : start,
-    stop  : lib.stop
-};
+// Conventionally, Node server APIs have a method like this, so we
+// provide this alias to be more friendly and familiar.
+sitecuesProxy.createServer = sitecuesProxy;
+sitecuesProxy.Server       = Server;
+
+module.exports = sitecuesProxy;
