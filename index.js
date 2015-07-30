@@ -7,7 +7,8 @@
 'use strict';
 
 var defaultPorts = require('./lib/default-ports'),
-    lib          = require('./lib');
+    lib          = require('./lib'),
+    util         = require('./lib/util').general;
 
 function Server(options) {
 
@@ -24,14 +25,15 @@ function Server(options) {
     // Make sure that we don't edit an object that does not belong to us.
     options = Object.create(options);
 
+    options.direction   = options.direction   || process.env.SITECUES_PROXY_DIRECTION    || process.env.PROXY_DIRECTION    || process.env.DIRECTION    || 'forward';
     options.hostname    = options.hostname    || process.env.SITECUES_PROXY_HOSTNAME     || process.env.PROXY_HOSTNAME     || process.env.HOSTNAME     || 'localhost';
     options.port        = options.port        || process.env.SITECUES_PROXY_PORT         || process.env.PROXY_PORT         || process.env.PORT         || defaultPorts[options.direction.trim().toLowerCase()];
-    options.direction   = options.direction   || process.env.SITECUES_PROXY_DIRECTION    || process.env.PROXY_DIRECTION    || process.env.DIRECTION    || 'forward';
     options.target      = options.target      || process.env.SITECUES_PROXY_TARGET       || process.env.PROXY_TARGET       || process.env.TARGET       || 'http://www.example.com';
-    // NOTE: Context path must begin and end with a slash '/'
+    // NOTE: Currently, the context path must begin and end with a slash '/'
     options.contextPath = options.contextPath || process.env.SITECUES_PROXY_CONTEXT_PATH || process.env.PROXY_CONTEXT_PATH || process.env.CONTEXT_PATH || '/';
     options.proxyLinks  = options.proxyLinks  || process.env.SITECUES_PROXY_LINKS        || process.env.PROXY_LINKS        || process.env.LINKS        || false;
     options.verbose     = options.verbose     || process.env.SITECUES_PROXY_VERBOSE      || process.env.PROXY_VERBOSE      || process.env.VERBOSE      || false;
+
     options.branch      = options.branch      || process.env.SITECUES_PROXY_BRANCH       || process.env.PROXY_BRANCH       || process.env.BRANCH       || false;
     options.siteId      = options.siteId      || process.env.SITECUES_PROXY_SITE_ID      || process.env.PROXY_SITE_ID      || process.env.SITE_ID      || 's-00000005';
     options.devVersion  = options.devVersion  || process.env.SITECUES_PROXY_DEV_VERSION  || process.env.PROXY_DEV_VERSION  || process.env.DEV_VERSION  || false;
@@ -39,14 +41,25 @@ function Server(options) {
     options.production  = options.production  || process.env.SITECUES_PROXY_PRODUCTION   || process.env.PROXY_PRODUCTION   || process.env.PRODUCTION   || false;
     options.ipAddress   = options.ipAddress   || process.env.SITECUES_PROXY_IP_ADDRESS   || process.env.PROXY_IP_ADDRESS   || process.env.IP_ADDRESS   || false;
 
+    options.loader      = options.loader      || process.env.SITECUES_PROXY_LOADER       || process.env.PROXY_LOADER       || process.env.LOADER;
+
+    // // NOT IMPLEMENTED. Take a filepath to find a loader, if one is not provided. Maybe we'll use a wathcer like Chokidar, too.
+    // options.loaderPath  = options.loaderPath  || process.env.SITECUES_PROXY_LOADER_PATH  || process.env.PROXY_LOADER_PATH  || process.env.LOADER_PATH;
+    // // NOT IMPLEMENTED. Take an object to dynamically construct a loader, if one is not provided.
+    // options.loaderOptions = options.loaderOptions || process.env.SITECUES_PROXY_LOADER_OPTIONS || process.env.PROXY_LOADER_OPTIONS || process.env.LOADER_OPTIONS;
+
+    // if (typeof options.loader === 'undefined' || options.loader === true) {
+    //     options.loadScript = util.createLoader();
+    // }
+
     // Delegate to the main library for all of the hard work
     // of actually setting up a server.
     lib.Server.call(this, options);
 }
-// Wrapper instance properties are the same as the main library's Server.
+// Instances inherit the same properties as those from the main library's Server.
 Server.prototype = Object.create(lib.Server.prototype);
-// Make sure instances known their correct constructor.
-// If we don't, this will be the main library Server.
+// Make sure instances inherit a correct reference to their constructor.
+// If we don't, this will be the main library's Server.
 Server.prototype.constructor = Server;
 
 function sitecuesProxy(options) {
