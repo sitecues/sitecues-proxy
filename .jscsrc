@@ -110,7 +110,7 @@
     "requireSpacesInsideParentheses"              : null,
     "safeContextKeyword"                          : "that",
     "validateIndentation"                         : 4,
-    "validateJSDoc" : {
+    "jsDoc" : {
         "checkParamNames"      : true,
         "checkRedundantParams" : true,
         "requireParamTypes"    : true
