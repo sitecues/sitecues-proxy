@@ -35,24 +35,24 @@
   },
   "dependencies": {
     "dangit": "0.2.3",
-    "hoxy": "1.2.4",
-    "is-absolute-url": "1.0.0",
+    "hoxy": "3.1.2",
+    "is-absolute-url": "2.0.0",
     "json-align": "0.1.0",
-    "mkdirp": "^0.5.1",
-    "pm2": "0.14.0",
+    "mkdirp": "0.5.1",
+    "pm2": "0.14.7",
     "portscanner": "1.0.0",
-    "winston": "1.0.0"
+    "winston": "1.0.1"
   },
   "devDependencies": {
     "grunt-cli": "0.1.13",
     "grunt": "0.4.5",
     "grunt-contrib-clean": "0.6.0",
     "grunt-jsonlint": "1.0.4",
-    "grunt-contrib-jshint": "0.11.2",
-    "grunt-jscs": "1.8.0",
+    "grunt-contrib-jshint": "0.11.3",
+    "grunt-jscs": "2.1.0",
     "grunt-jslint": "1.1.14",
-    "grunt-selenium-webdriver": "0.2.450",
-    "intern": "theintern/intern#master",
+    "grunt-selenium-webdriver": "0.2.451",
+    "intern": "3.0.3",
     "grunt-contrib-watch": "0.6.1"
   },
   "keywords": [
