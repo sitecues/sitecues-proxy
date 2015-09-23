@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
-// This module defines the command line tool for this app.
+// The command line interface for the sitecues Proxy.
 
-// Use the main module defined in the package.json manifest to spin up a proxy.
-require('../').start();
+// Use the main module in the package.json manifest to get a hold of the API.
+var sitecuesProxy = require('../'),
+    server;
+
+server = sitecuesProxy.createServer();
+
+server.listen();
