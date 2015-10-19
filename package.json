@@ -34,6 +34,7 @@
     "bin": "./bin"
   },
   "dependencies": {
+    "bluebird": "^2.10.2",
     "dangit": "0.2.3",
     "hoxy": "3.1.2",
     "is-absolute-url": "2.0.0",
