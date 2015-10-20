@@ -1,4 +1,3 @@
-//test commit
 // This is the main entry point for the sitecues proxy.
 //
 
