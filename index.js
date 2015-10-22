@@ -122,7 +122,7 @@ class FriendlyServer extends Server {
 
 
         // Whether to convert page links to proxy links.
-        options.proxyLinks = Boolean(options.proxyLinks  || safeDefault.proxyLinks);
+        options.proxyLinks = Boolean(options.proxyLinks || safeDefault.proxyLinks);
 
 
         // NOTE: Currently, the context path must begin and end with a slash '/'
@@ -137,17 +137,16 @@ class FriendlyServer extends Server {
         }
 
 
+        // TODO: Figure out how to take loader settings. Would it be acceptable
+        //       for a user to explicitly provide the entire string? The server
+        //       might need to know the Site ID for other purposes, which would
+        //       then demand robust parsing, adding more processing complexity.
+
         // // NOT IMPLEMENTED. Provide a load script directly.
         // options.loader      = options.loader      || process.env.SITECUES_PROXY_LOADER       || process.env.PROXY_LOADER       || process.env.LOADER;
 
-        // // NOT IMPLEMENTED. Take a filepath to find a loader, if one is not provided. Maybe we'll use a wathcer like Chokidar, too.
-        // options.loaderPath  = options.loaderPath  || process.env.SITECUES_PROXY_LOADER_PATH  || process.env.PROXY_LOADER_PATH  || process.env.LOADER_PATH;
         // // NOT IMPLEMENTED. Take an object to dynamically construct a loader, if one is not provided.
         // options.loaderOptions = options.loaderOptions || process.env.SITECUES_PROXY_LOADER_OPTIONS || process.env.PROXY_LOADER_OPTIONS || process.env.LOADER_OPTIONS;
-
-        // if (typeof options.loader === 'undefined' || options.loader === true) {
-        //     options.loadScript = util.createLoader();
-        // }
 
 
         // Delegate to the main library for all of the hard work of actually
