@@ -6,9 +6,9 @@
 const staticDefault = require('./lib/defaults'),
       Server        = require('./lib').Server,
       util          = require('./lib/util').general,
-      portType      = require('port-type');
-
-const MIN_PORT = 0,
+      portType      = require('port-type'),
+      // NOTE: Port 0 is a special case. It means "give me a random port".
+      MIN_PORT = 0,
       MAX_PORT = 65535;
 
 // To be considered valid, the port number has to exactly equal the min or max,
@@ -55,6 +55,8 @@ class FriendlyServer extends Server {
                   // // NOT IMPLEMENTED. Take an object to dynamically construct a loader, if one is not provided.
                   // loaderOptions : process.env.SITECUES_PROXY_LOADER_OPTIONS || process.env.PROXY_LOADER_OPTIONS || process.env.LOADER_OPTIONS
               },
+              // NOTE: Port is intentionally absent from this list, as it needs
+              //       to be determined dynamically based on direction.
               safeDefault = {
                   direction   : perCallDefault.direction   || staticDefault.direction,
                   hostname    : perCallDefault.hostname    || staticDefault.hostname,
@@ -97,7 +99,8 @@ class FriendlyServer extends Server {
             options.hostname = safeDefault.hostname;
         }
 
-
+        // TODO: Fix port permutation. It currently throws too easily. It needs
+        //       to be more friendly to undefined, empty string, etc.
         if (typeof options.port === 'string') {
             options.port = options.port.trim().toLowerCase();
         }
