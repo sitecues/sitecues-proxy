@@ -4,7 +4,7 @@
 'use strict';
 
 const staticDefault = require('./lib/defaults'),
-      Server        = require('./lib').Server,
+      Server        = require('./lib/Server'),
       util          = require('./lib/util').general,
       portType      = require('port-type'),
       // NOTE: Port 0 is a special case. It means "give me a random port".
@@ -21,10 +21,10 @@ function isValidPortNumber(port) {
 }
 
 function assertValidPortNumber(portInt, originalInput) {
-    if (!isValidPortNumber(port)) {
+    if (!isValidPortNumber(portInt)) {
         throw new RangeError(
-                originalInput + 'is not a valid port number (' +
-                MIN_PORT + ' - ' + MAX_PORT + ').'
+                originalInput + ' is not a valid port number of ' +
+                MIN_PORT + ' - ' + MAX_PORT + '.'
             );
     }
 }
