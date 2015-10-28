@@ -1,5 +1,4 @@
 // This is the main entry point for the sitecues proxy.
-//
 
 'use strict';
 
@@ -99,17 +98,21 @@ class FriendlyServer extends Server {
             options.hostname = safeDefault.hostname;
         }
 
-        // TODO: Fix port permutation. It currently throws too easily. It needs
-        //       to be more friendly to undefined, empty string, etc.
+
+        // Which port the proxy should listen on, assuming the user does not
+        // override it when using .listen()
         if (typeof options.port === 'string') {
             options.port = options.port.trim().toLowerCase();
         }
         if (options.port !== 'auto') {
-            let portInt = Math.round(parseFloat(options.port));
-            assertValidPortNumber(portInt, options.port);
-            options.port = portInt;
-            // What to do as a fallback...
-            // options.port = perCallDefault.port || staticDefault.port[options.direction];
+            const portInt = Math.round(parseFloat(options.port));
+            if (Number.isNaN(portInt)) {
+                options.port = perCallDefault.port || staticDefault.port[options.direction];
+            }
+            else {
+                assertValidPortNumber(portInt, options.port);
+                options.port = portInt;
+            }
         }
 
 
@@ -158,13 +161,16 @@ class FriendlyServer extends Server {
     }
 }
 
+// The sitecues proxy is actually a FriendlyServer factory.
 function sitecuesProxy(options) {
     return new FriendlyServer(options);
 }
 
-// Conventionally, Node server APIs have a method like this, so we
+// Conventionally, Node server APIs have a factory named like this, so we
 // provide this alias to be more friendly and familiar.
 sitecuesProxy.createServer = sitecuesProxy;
+// As far as the outside world is concerned, there's only one kind of server,
+// which happens to be a friendly server.
 sitecuesProxy.Server       = FriendlyServer;
 
 module.exports = sitecuesProxy;
