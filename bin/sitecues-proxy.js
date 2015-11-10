@@ -9,6 +9,11 @@ const sitecuesProxy = require('../'),
       server = sitecuesProxy.createServer(),
       log = require('../lib/log');
 
+// Crash and burn, die fast if there a rejected promise is not caught.
+process.on('unhandledRejection', function (reason, p) {
+    throw reason;
+});
+
 let message = 'The sitecues\u00AE';
 
 server.listen()
