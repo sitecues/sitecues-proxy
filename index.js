@@ -5,8 +5,8 @@
 const FriendlyServer = require('./lib/FriendlyServer');
 
 // The sitecues proxy is actually a FriendlyServer factory.
-function sitecuesProxy(options) {
-    return new FriendlyServer(options);
+function sitecuesProxy() {
+    return new FriendlyServer(...arguments);
 }
 
 // Conventionally, Node server APIs have a factory named like this, so we
