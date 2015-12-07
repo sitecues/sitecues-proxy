@@ -9,17 +9,17 @@
      */
     "apps" : [
         // The forward proxy. Useful for local development of sitecues.js
-        {
-            "name"   : "sitecues-proxy",
-            "script" : "bin/sitecues-proxy.js",
-            "exec_mode" : "cluster",
-            "instances" : 2,
-            "max_memory_restart" : "140M",
-            "env" : {
-                "DIRECTION" : "forward",
-                "SITE_ID"   : "s-98595d91"
-            }
-        },
+        // {
+        //     "name"   : "sitecues-proxy",
+        //     "script" : "bin/sitecues-proxy.js",
+        //     "exec_mode" : "cluster",
+        //     "instances" : 2,
+        //     "max_memory_restart" : "140M",
+        //     "env" : {
+        //         "DIRECTION" : "forward",
+        //         "SITE_ID"   : "s-98595d91"
+        //     }
+        // },
         // The reverse proxy. Useful for sharing sitecues-enabled links.
         {
             "name"   : "sitecues-rev-proxy",
@@ -43,12 +43,12 @@
      */
     "deploy" : {
         "dev" : {
-            "user" : "scproxy",
+            "user" : "thor",
             "host" : "proxy.dev.sitecues.com",
-            "ref"  : "origin/master",
             "repo" : "git@bitbucket.org:ai_squared/sitecues-proxy.git",
+            "ref"  : "origin/master",
             "path" : "/srv/sitecues-proxy",
-            "post-deploy" : "npm install ; pm2 startOrReload ecosystem.json --env dev"
+            "post-deploy" : "npm install && pm2 startOrReload ecosystem.json --env dev"
         }
     }
 }
