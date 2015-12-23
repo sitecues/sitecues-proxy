@@ -7,6 +7,8 @@ define(
     ],
     function (testSuites) {
 
+        'use strict';
+
         var build = 'UNKNOWN',
             proxyPort = 9000,
             testDir = 'test/';
