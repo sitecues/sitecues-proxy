@@ -209,6 +209,6 @@ function taskRunner(grunt) {
     // Default task, will run if no task is specified.
     grunt.registerTask('default', ['clean', 'lint', 'test']);
 
-};
+}
 
 module.exports = taskRunner;
