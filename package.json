@@ -49,7 +49,7 @@
     "read-pkg-up": "1.0.1",
     "require-dir": "0.3.0",
     "root-check": "1.0.0",
-    "url-type": "0.0.2",
+    "url-type": "0.1.0",
     "winston": "2.1.1"
   },
   "devDependencies": {
