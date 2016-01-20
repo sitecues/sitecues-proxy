@@ -17,7 +17,10 @@ process.on('unhandledRejection', function (err) {
     throw err;
 });
 
-server.listen()
+server.init()
+    .then(function () {
+        return server.listen();
+    })
     .then(function (server) {
         // Attempt to set UID to a normal user now that we definitely
         // do not need elevated privileges.
