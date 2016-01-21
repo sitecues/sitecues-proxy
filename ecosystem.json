@@ -25,8 +25,8 @@
             "name"   : "sitecues-rev-proxy",
             "script" : "bin/sitecues-proxy.js",
             "exec_mode" : "cluster",
-            "instances" : 2,
-            "max_memory_restart" : "140M",
+            "instances" : -1,
+            "max_memory_restart" : "120M",
             "env" : {
                 "DIRECTION" : "reverse",
                 "SITE_ID"   : "s-98595d91"
@@ -43,10 +43,10 @@
      */
     "deploy" : {
         "dev" : {
-            "user" : "thor",
+            "user" : "proxy",
             "host" : "proxy.dev.sitecues.com",
             "repo" : "git@bitbucket.org:ai_squared/sitecues-proxy.git",
-            "ref"  : "origin/master",
+            "ref"  : "origin/prototypal",
             "path" : "/srv/sitecues-proxy",
             "post-deploy" : "npm install && pm2 startOrReload ecosystem.json --env dev"
         }
