@@ -32,7 +32,8 @@
                 "SITE_ID"   : "s-98595d91"
             },
             "env_dev" : {
-                "HOSTNAME" : "proxy.dev.sitecues.com"
+                "HOSTNAME" : "proxy.dev.sitecues.com",
+                "PORT"     : "7000"
             }
         }
     ],
