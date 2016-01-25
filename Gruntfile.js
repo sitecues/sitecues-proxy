@@ -2,25 +2,45 @@
 
 'use strict';
 
+const
+    configFiles = [
+        'Gruntfile.js',
+        'config/**/*.js'
+    ],
+    testFiles = [
+        'test/**/*.js'
+    ],
+    appFiles = [
+        // The "main" file as defined in package.json.
+        '<%= pkg.main %>',
+        // CLI modules.
+        'bin/**/*.js',
+        // Primary source code modules.
+        'lib/**/*.js'
+    ];
+
 function taskRunner(grunt) {
 
     // Task configuration.
     grunt.initConfig(
         {
-            // Getting the full node app configuration as an object
+            // Getting the Node app configuration as an object,
             // which can be used internally.
             pkg : grunt.file.readJSON('package.json'),
 
             // Clean configuration, used to wipe out temporary build data,
             // for more robust and reliable builds.
             clean : {
+                // Enable this to do a dry run (logs but no actual changes)
                 // options : {
-                //     'no-write': true  // dry run (logs but no actual changes)
+                //     'no-write': true
                 // },
                 normal : {
                     src : [
-                        'report',  // directory created by the test system
-                        'log'      // directory created by the proxy at runtime
+                        // Test results.
+                        'report',
+                        // App logs.
+                        'log'
                     ]
                 }
             },
@@ -28,7 +48,6 @@ function taskRunner(grunt) {
             // JSONLint configuration, used for linting config files.
             jsonlint : {
                 normal : {
-                    // be explicit, globbing too much hurts build performance.
                     src : [
                         'package.json',
                         'config/**/*.json',
@@ -40,36 +59,28 @@ function taskRunner(grunt) {
 
             // JSHint configuration, used for linting the library...
             jshint : {
+                // Task local options, these override JSHint defaults and are
+                // inherited by all targets in this task.
                 options : {
-                    // Options here override JSHint defaults and are 'task local',
-                    // meaning all targets in this task inherit these options...
-                    jshintrc : true  // look for config near each linted file
+                    // Look for config near each linted file
+                    jshintrc : true
                 },
                 config : {
                     // This target knows how to lint the build system.
                     files : {
-                        src : [
-                            'Gruntfile.js',   // build system
-                            'config/**/*.js'
-                        ]
+                        src : configFiles
                     }
                 },
                 tests : {
                     // This target knows how to lint the app's tests.
                     files : {
-                        src : [
-                            'test/**/*.js'
-                        ]
+                        src : testFiles
                     }
                 },
                 app : {
                     // This target knows how to lint the primary app.
                     files : {
-                        src : [
-                            '<%= pkg.main %>',  // "main" defined in package.json
-                            'bin/**/*.js',      // CLI modules
-                            'lib/**/*.js'       // primary source files
-                        ]
+                        src : appFiles
                     }
                 }
             },
@@ -77,33 +88,22 @@ function taskRunner(grunt) {
             // JSCS configuration, used for enforcing coding style requirements.
             jscs : {
                 options : {
-                    config : true  // look for config near each linted file
+                    // Look for config near each linted file.
+                    config : true
                 },
                 config : {
                     files : {
-                        src : [
-                            'Gruntfile.js',
-                            'config/**/*.js'
-                        ]
+                        src : configFiles
                     }
                 },
                 tests : {
-                    options : {
-                        disallowKeywords : null  // tests are allowed to use 'with'
-                    },
                     files : {
-                        src : [
-                            'test/**/*.js'
-                        ]
+                        src : testFiles
                     }
                 },
                 app : {
                     files : {
-                        src : [
-                            '<%= pkg.main %>',  // "main" defined in package.json
-                            'bin/**/*.js',      // CLI modules
-                            'lib/**/*.js'       // primary source files
-                        ]
+                        src : appFiles
                     }
                 }
             },
@@ -112,66 +112,42 @@ function taskRunner(grunt) {
             jslint : {
                 options : {
                     // Version of JSLint to use.
-                    edition : 'latest'  // most current by default
+                    edition : 'latest'
                 },
                 config : {
                     files : {
-                        src : [
-                            'Gruntfile.js',
-                            'config/**/*.js'
-                        ]
+                        src : configFiles
                     }
                 },
                 tests : {
                     files : {
-                        src : [
-                            'test/**/*.js'
-                        ]
+                        src : testFiles
                     }
                 },
                 app : {
                     files : {
-                        src : [
-                            '<%= pkg.main %>',  // "main" defined in package.json
-                            'bin/**/*.js',      // CLI modules
-                            'lib/**/*.js'       // primary source files
-                        ]
+                        src : appFiles
                     },
                     directives : {
-                        white   : true,  // Be quiet about whitespace, we have JSCS.
-                        maxlen  : 80     // Max line length in characters.
+                        // Be quiet about whitespace, JSCS is smarter.
+                        white   : true,
+                        // Max line length in characters.
+                        maxlen  : 80
                     }
-                }
-            },
-
-            // Selenium configuration, used for the app's functional testing.
-            selenium_start : {
-                // NOTE: This server is destroyed when grunt exits.
-                // You MUST chain this with other tasks.
-                options : {
-                    port : 4447
                 }
             },
 
             // Intern configuration, used for the app's automated tests.
             intern : {
                 options : {
-                    config  : 'config/intern',  // test framework config
-                    runType : 'client'          // unit testing mode
+                    // Test framework config file path.
+                    config  : 'config/intern',
+                    // Whether to run in Node or the browser. Proxy runs in Node.
+                    runType : 'client'
                 },
                 normal : {
-                    // empty target because it inherits task local options
-                },
-                cloud : {
-                    options : {
-                        config : 'config/intern-cloud'
-                    }
+                    // Empty target because it inherits task local options.
                 }
-            },
-
-            // Selenium configuration, used for the app's functional testing.
-            selenium_stop : {
-                options : { }
             },
 
             // Watch configuration, used for automatically executing
@@ -192,8 +168,6 @@ function taskRunner(grunt) {
     grunt.loadNpmTasks('grunt-jscs');
     // Load the plugin that provides the "jslint" task.
     grunt.loadNpmTasks('grunt-jslint');
-    // Load the plugin that provides the "start_selenium" and "start_selenium" tasks.
-    grunt.loadNpmTasks('grunt-selenium-webdriver');
     // Load the plugin that provides the "intern" task.
     grunt.loadNpmTasks('intern');
     // Load the plugin that provides the "watch" task.
@@ -204,11 +178,10 @@ function taskRunner(grunt) {
     // Make a new task called 'opinion'.
     grunt.registerTask('opinion', ['lint', 'jslint']);
     // Make a new task called 'test'.
-    grunt.registerTask('test', ['selenium_start', 'intern:normal']);
+    grunt.registerTask('test', ['intern:normal']);
 
     // Default task, will run if no task is specified.
     grunt.registerTask('default', ['clean', 'lint', 'test']);
-
 }
 
 module.exports = taskRunner;
