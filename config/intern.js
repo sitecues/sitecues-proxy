@@ -2,31 +2,43 @@
 // Other files can use this as an AMD module.
 
 define(
-    [   // dependencies...
-        'test/all'
+    [
+        'intern',
+        '../test/all-unit',
+        '../test/all-functional'
     ],
-    function (testSuites) {
+    function (intern, allUnit, allFunctional) {
 
         'use strict';
 
-        var build = 'UNKNOWN',
+        const
             proxyPort = 9000,
-            testDir = 'test/';
+            // This path is relative to baseUrl.
+            testDir = '../../test/',
+            // Name of the alias to the unit suite directory.
+            UNIT_PKG = 'unit',
+            // Name of the alias to the functional suite directory.
+            FUNC_PKG = 'functional';
 
+        let build = 'UNKNOWN';
+
+        if (intern.args.build) {
+            build = intern.args.build;
+        }
         // make sure we are in Node and not a browser...
-        if (typeof process !== 'undefined' && process.env) {
-            build = process.env.BUILD || process.env.COMMIT || process.env.TRAVIS_COMMIT;
+        else if (typeof process === 'object' && process && process.env) {
+            build = process.env.BUILD || process.env.COMMIT;
         }
 
         return {
-            proxyPort : proxyPort,
-            proxyUrl  : 'http://localhost:' + proxyPort + '/',
+            proxyPort,
+            proxyUrl : `http://localhost:${proxyPort}/`,
 
+            // Miscellaneous configuration, mainly for Selenium.
+            // Examples: https://code.google.com/p/selenium/wiki/DesiredCapabilities
             capabilities : {
-                // See examples: https://code.google.com/p/selenium/wiki/DesiredCapabilities
-                name : 'Automated Test - sitecues proxy',  // name of the test run, for logging purposes
-                'selenium-version' : '2.45.0',             // request a version, which may not always be respected
-                build : build                            // useful to log success history tied to code changes
+                name : 'Automated Test - sitecues-proxy',
+                build
             },
             // Places where unit and/or functional tests will be run...
             environments : [
@@ -35,44 +47,60 @@ define(
                 { browserName : 'chrome' }
             ],
 
-            maxConcurrency : 3,  // how many browsers may be open at once
+            // How many browsers may be open at once.
+            maxConcurrency : 3,
 
-            // Specify which AMD module loader to use...
+            // Specify which AMD module loader to use.
             // loaders: {
 
             // }
-            // Options to pass to the AMD module loader...
+            // Options to pass to the AMD module loader.
             loaderOptions : {
                 packages : [
-                    { name : 'unit', location : testDir + 'unit' },
-                    { name : 'functional', location : testDir + 'functional' }
+                    { name: UNIT_PKG, location: `${testDir}unit` },
+                    { name: FUNC_PKG, location: `${testDir}functional` }
                 ]
             },
 
-            // Each cloud testing service has their own weird quirks and different APIs,
-            // so load up the necessary configuration to talk to them...
-            tunnel : 'NullTunnel',         // no tunnel (default, if none provided)
-            // tunnel : 'BrowserStackTunnel', // BrowserStack
-            // tunnel : 'SauceLabsTunnel',    // SauceLabs
-            // tunnel : 'TestingBotTunnel',   // TestingBot
+            // Which type of WebDriver session to create.
+            tunnel : 'NullTunnel',
+
             tunnelOptions : {
-                host : 'localhost:4447'  // custom location to find the selenium server
-                // verbose : true           // more logging, only supported by BrowserStack
+                // Custom location to find the WebDriver server.
+                host : 'localhost:4447'
+                // Extra logging, only supported by BrowserStack.
+                // verbose : true
             },
 
-            // These are unit tests, which check the APIs of our application...
-            suites : testSuites.unit,
-            // These are functional tests, which check the user-facing behavior of our application...
-            functionalSuites : testSuites.functional,
+            // Which unit test suite files to load. These test our APIs.
+            suites: allUnit.map(function (suite) {
+                return UNIT_PKG + '/' + suite;
+            }),
+            // Which functional test suite files to load. These test our
+            // user-facing behavior.
+            functionalSuites: allFunctional.map(function (suite) {
+                return FUNC_PKG + '/' + suite;
+            }),
 
-            // Any test IDs ("suite name - test name") which do NOT match this regex will be skipped...
+            // Test whitelist, matched against "suite name - test name".
+            // Everything else will be skipped.
             grep : /.*/,
 
-            // The paths that match this regex will NOT be included in code coverage reports...
+            // Ignore some code for test coverage reports, even if it loads
+            // during testing. The paths that match this pattern will NOT
+            // count against coverage.
             excludeInstrumentation : /^(?:config|test|node_modules)\//
 
-            // Test result output mechanisms.
-            // reporters : ['Pretty']
+            // How to display or save test run info.
+            // reporters: [
+            //     // Test result reporters.
+            //     { id : 'Runner' }
+            //     // { id : 'JUnit',    filename : 'report/test/junit.xml' },
+            //     // // Code coverage reporters.
+            //     // { id : 'Cobertura', filename  : 'report/coverage/info/cobertura.info' },
+            //     // { id : 'Lcov',      filename  : 'report/coverage/info/lcov.info' },
+            //     // { id : 'LcovHtml',  directory : 'report/coverage/html' }
+            // ]
         };
     }
 );
