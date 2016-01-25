@@ -1,8 +1,6 @@
 # `/test`
 This folder contains automated test cases and helpers.
 
-Note: We have two similar folders, `/test` and `/tests`. This is temporary - it's part of a migration effort to convert all of our unit tests to Intern, a more streamlined testing system. When everything is done, the old `/tests` folder will go away.
-
 ### Get Started
 See the [full documentation](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=38666258 "Documentation for Automated Tests.").
 
