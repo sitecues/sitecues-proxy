@@ -33,7 +33,7 @@
             },
             "env_dev" : {
                 "HOSTNAME" : "proxy.dev.sitecues.com",
-                "PORT"     : "7000"
+                "PORT"     : "8001"
             }
         }
     ],
