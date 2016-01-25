@@ -1,18 +1,17 @@
 // This file is used as a unit test for the sitecues-url module.
 
 define(
-    [   // Dependencies.
-        'intern!tdd',          // the testing interface - defines how we register suites and tests
-        'intern/chai!assert',  // helps throw errors to fail tests, based on conditions
-        'intern/dojo/node!../../../../lib/util/sitecues-url'  // Node's filesystem API, used to save screenshots
+    [
+        'intern!tdd',
+        'intern/chai!assert',
+        'intern/dojo/node!../../../../lib/util/sitecues-url'
     ],
     function (tdd, assert, sitecuesUrl) {
 
         'use strict';
 
         const
-            suite = tdd.suite,
-            test  = tdd.test;
+            { suite, test } = tdd;
 
         suite('basics', function () {
             test('environments', function () {
