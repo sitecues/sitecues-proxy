@@ -36,7 +36,7 @@ server.init()
         if (state.reverseMode) {
             message += ' reverse';
         }
-        message += ' proxy is on port ' + state.port + '.';
+        message += ` proxy is on port ${state.port}.`;
 
         log.info(message);
     });

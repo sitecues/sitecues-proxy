@@ -25,7 +25,8 @@ define(
         if (intern.args.build) {
             build = intern.args.build;
         }
-        // make sure we are in Node and not a browser...
+
+        // Make sure we are in Node and not a browser.
         else if (typeof process === 'object' && process && process.env) {
             build = process.env.BUILD || process.env.COMMIT;
         }
@@ -40,7 +41,7 @@ define(
                 name : 'Automated Test - sitecues-proxy',
                 build
             },
-            // Places where unit and/or functional tests will be run...
+            // Places where unit and/or functional tests will be run.
             environments : [
                 // { browserName : 'safari' },
                 // { browserName : 'firefox' },
@@ -51,14 +52,14 @@ define(
             maxConcurrency : 3,
 
             // Specify which AMD module loader to use.
-            // loaders: {
+            // loaders : {
 
             // }
             // Options to pass to the AMD module loader.
             loaderOptions : {
                 packages : [
-                    { name: UNIT_PKG, location: `${testDir}unit` },
-                    { name: FUNC_PKG, location: `${testDir}functional` }
+                    { name : UNIT_PKG, location : `${testDir}unit` },
+                    { name : FUNC_PKG, location : `${testDir}functional` }
                 ]
             },
 
@@ -73,13 +74,13 @@ define(
             },
 
             // Which unit test suite files to load. These test our APIs.
-            suites: allUnit.map(function (suite) {
-                return UNIT_PKG + '/' + suite;
+            suites : allUnit.map((suite) => {
+                return `${UNIT_PKG}/${suite}`;
             }),
             // Which functional test suite files to load. These test our
             // user-facing behavior.
-            functionalSuites: allFunctional.map(function (suite) {
-                return FUNC_PKG + '/' + suite;
+            functionalSuites : allFunctional.map((suite) => {
+                return `${FUNC_PKG}/${suite}`;
             }),
 
             // Test whitelist, matched against "suite name - test name".
@@ -92,7 +93,7 @@ define(
             excludeInstrumentation : /^(?:config|test|node_modules)\//
 
             // How to display or save test run info.
-            // reporters: [
+            // reporters : [
             //     // Test result reporters.
             //     { id : 'Runner' }
             //     // { id : 'JUnit',    filename : 'report/test/junit.xml' },
