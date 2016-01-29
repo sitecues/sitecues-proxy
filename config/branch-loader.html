@@ -1,9 +1,9 @@
 <script data-provider="sitecues-proxy" type="application/javascript">
-    // Production script injected via sitecues-proxy
+    // Development BRANCH script injected via sitecues-proxy
     var sitecues = window.sitecues = window.sitecues || {};
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    sitecues.config.scriptUrl = '//js.sitecues.com/l/s;id=' + sitecues.config.siteId + '/js/sitecues.js';
+    sitecues.config.scriptUrl = 'http://js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/v/{{{BRANCH}}}/latest/js/sitecues.js';
     (function () {
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];
