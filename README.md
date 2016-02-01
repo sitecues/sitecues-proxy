@@ -69,22 +69,22 @@ Inject a specific load script such as config/local-loader.html (uses config/load
 LOADER_FILE=filename npm start
 ````
 
-Inject a specific branch.
+Inject a specific branch (default BRANCH is dev).
 ````sh
 LOADER_FILE=config/branch-loader.html BRANCH=x-newpanel npm start
 ````
 
-Inject a specific release candidate, deployed by CI.
+Inject a specific release candidate, deployed by CI (no default for VERSION).
 ````sh
 LOADER_FILE=config/release-loader.html VERSION=3.1.2 npm start
 ````
 
-Inject a specific development version, deployed by CI.
+Inject a specific development version, deployed by CI (no default for VERSION).
 ````sh
 LOADER_FILE=config/dev-loader.html VERSION=32.673 npm start
 ````
 
-Specify a hostname to associate the proxy with.
+Specify a hostname to associate the proxy with (default JS_HOSTNAME is localhost).
 ````sh
 LOADER_FILE=config/local-loader.html JS_HOSTNAME=localhost npm start
 ````
