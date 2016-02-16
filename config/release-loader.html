@@ -2,13 +2,14 @@
     // Development script injected via sitecues-proxy
     var sitecues = window.sitecues = window.sitecues || {},
         // We need the major and minor version as a string, e.g. '4.0' from full version number '4.0.13'
-        releaseSplit = '{{{VERSION}}}'.split('.'),
+        rawVersion = '{{{RAWVERSION}}}',
+        releaseSplit = rawVersion.split('.'),
         majorVer = releaseSplit[0],
         minorVer = releaseSplit[1],
         majMinVer = majorVer + '.' + minorVer;  
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    sitecues.config.scriptUrl = '//js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/v/release-' + majMinVer + '/{{{VERSION}}}-RELEASE/js/sitecues.js';
+    sitecues.config.scriptUrl = '//js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/release-' + majMinVer + '/' + rawVersion + '-RELEASE/js/sitecues.js';
     (function () {
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];

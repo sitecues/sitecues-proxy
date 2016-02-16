@@ -10,6 +10,8 @@ A web server that sits between you and a website, to add or remove sitecues.
 **Documentation**: [The sitecues&reg; Proxy](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=36241450 "Documentation for the sitecues Proxy.")    
 **Author**: [Seth Holladay](http://seth-holladay.com "Personal website for Seth Holladay.")
 
+Note: simple instructions for testers here: https://equinox.atlassian.net/wiki/display/EN/Using+the+forward+proxy+to+test
+
 ## Installation
 
 Download the project.
@@ -69,19 +71,14 @@ Inject a specific load script such as config/local-loader.html (uses config/load
 LOADER_FILE=filename npm start
 ````
 
-Inject a specific branch (default BRANCH is dev).
+Inject a specific branch and/or version (default BRANCH is dev. default VERSION is latest).
 ````sh
-LOADER_FILE=config/branch-loader.html BRANCH=x-newpanel npm start
+LOADER_FILE=config/dev-loader.html BRANCH=(some branch name) VERSION=(some version number) npm start
 ````
 
 Inject a specific release candidate, deployed by CI (no default for VERSION).
 ````sh
 LOADER_FILE=config/release-loader.html VERSION=3.1.2 npm start
-````
-
-Inject a specific development version, deployed by CI (no default for VERSION).
-````sh
-LOADER_FILE=config/dev-loader.html VERSION=32.673 npm start
 ````
 
 Specify a hostname to associate the proxy with (default JS_HOSTNAME is localhost).

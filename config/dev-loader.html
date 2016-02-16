@@ -3,7 +3,7 @@
     var sitecues = window.sitecues = window.sitecues || {};
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    sitecues.config.scriptUrl = '//js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/v/dev/{{{VERSION}}}-DEV/js/sitecues.js';
+    sitecues.config.scriptUrl = '//js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/{{{BRANCH}}}/{{{VERSION}}}/js/sitecues.js';
     (function () {
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];
