@@ -1,0 +1,55 @@
+/**
+ *  This file defines the configuration for managing the sitecues proxy as a
+ *  service with PM2.
+ */
+{
+    /**
+     *  Application settings.
+     *  http://pm2.keymetrics.io/docs/usage/application-declaration/
+     */
+    "apps" : [
+        // The forward proxy. Useful for local development of sitecues.js
+        // {
+        //     "name"   : "sitecues-proxy",
+        //     "script" : "bin/sitecues-proxy.js",
+        //     "exec_mode" : "cluster",
+        //     "instances" : 2,
+        //     "max_memory_restart" : "140M",
+        //     "env" : {
+        //         "DIRECTION" : "forward",
+        //         "SITE_ID"   : "s-98595d91"
+        //     }
+        // },
+        // The reverse proxy. Useful for sharing sitecues-enabled links.
+        {
+            "name"   : "sitecues-rev-proxy",
+            "script" : "bin/sitecues-proxy.js",
+            "exec_mode" : "cluster",
+            "instances" : -1,
+            "max_memory_restart" : "120M",
+            "env" : {
+                "DIRECTION" : "reverse",
+                "SITE_ID"   : "s-98595d91"
+            },
+            "env_dev" : {
+                "HOSTNAME" : "proxy.dev.sitecues.com",
+                "PORT"     : "8001"
+            }
+        }
+    ],
+
+    /**
+     *  Deployment settings.
+     *  http://pm2.keymetrics.io/docs/usage/deployment/
+     */
+    "deploy" : {
+        "dev" : {
+            "user" : "proxy",
+            "host" : "proxy.dev.sitecues.com",
+            "repo" : "git@bitbucket.org:ai_squared/sitecues-proxy.git",
+            "ref"  : "origin/prototypal",
+            "path" : "/srv/sitecues-proxy",
+            "post-deploy" : "npm install && pm2 startOrReload ecosystem.json --env dev"
+        }
+    }
+}
