@@ -25,7 +25,7 @@
             "name"   : "sitecues-rev-proxy",
             "script" : "bin/sitecues-proxy.js",
             "exec_mode" : "cluster",
-            "instances" : -1,
+            "instances" : 2,
             "max_memory_restart" : "120M",
             "env" : {
                 "DIRECTION" : "reverse",
@@ -34,6 +34,22 @@
             "env_dev" : {
                 "HOSTNAME" : "proxy.dev.sitecues.com",
                 "PORT"     : "8001"
+            }
+        },
+        {
+            "name"   : "sitecues-rev-proxy-links",
+            "script" : "bin/sitecues-proxy.js",
+            "exec_mode" : "cluster",
+            "instances" : 2,
+            "max_memory_restart" : "120M",
+            "env" : {
+                "DIRECTION" : "reverse",
+                "SITE_ID"   : "s-98595d91",
+                "PROXY_LINKS" : true
+            },
+            "env_dev" : {
+                "HOSTNAME" : "proxy.dev.sitecues.com",
+                "PORT"     : "7000"
             }
         }
     ],
