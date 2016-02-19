@@ -17,7 +17,14 @@ const
         'bin/**/*.js',
         // Primary source code modules.
         'lib/**/*.js'
-    ];
+    ],
+    jsLintDirectives = {
+        // Be quiet about whitespace, JSCS is smarter.
+        white  : true,
+        // Max line length in characters.
+        maxlen : 80,
+        node   : true
+    };
 
 function taskRunner(grunt) {
 
@@ -110,30 +117,23 @@ function taskRunner(grunt) {
 
             // JSLint configuration, used for advice on code style.
             jslint : {
-                options : {
-                    // Version of JSLint to use.
-                    edition : 'latest'
-                },
                 config : {
                     files : {
                         src : configFiles
-                    }
+                    },
+                    directives : jsLintDirectives
                 },
                 tests : {
                     files : {
                         src : testFiles
-                    }
+                    },
+                    directives : jsLintDirectives
                 },
                 app : {
                     files : {
                         src : appFiles
                     },
-                    directives : {
-                        // Be quiet about whitespace, JSCS is smarter.
-                        white   : true,
-                        // Max line length in characters.
-                        maxlen  : 80
-                    }
+                    directives : jsLintDirectives
                 }
             },
 
