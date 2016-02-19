@@ -104,7 +104,7 @@
         "checkTypes"                         : true,
         "checkRedundantAccess"               : true,
         "leadingUnderscoreAccess"            : true,
-        "enforceExistence"                   : true,
+        "enforceExistence"                   : false,
         "requireHyphenBeforeDescription"     : true,
         "requireNewlineAfterDescription"     : true,
         "requireDescriptionCompleteSentence" : true,
@@ -121,7 +121,7 @@
     },
     "maximumNumberOfLines"                          : 680,
     "requireAlignedMultilineParams"                 : "firstParam",
-    "requireAlignedObjectValues"                    : "all",
+    "requireAlignedObjectValues"                    : null,
     "requireAnonymousFunctions"                     : null,
     "requireArrayDestructuring"                     : true,
     "requireArrowFunctions"                         : null,
@@ -143,7 +143,6 @@
         "var",
         "let",
         "const",
-        "if",
         "else",
         "for",
         "while",
@@ -159,25 +158,28 @@
     "requireLineFeedAtFileEnd"                      : true,
     "requireMatchingFunctionName"                   : true,
     "requireMultiLineTernary"                       : null,
-    "requireMultipleVarDecl"                        : "onevar",
+    "requireMultipleVarDecl"                        : true,
     "requireNamedUnassignedFunctions"               : null,
     "requireNewlineBeforeBlockStatements"           : null,
     "requireNumericLiterals"                        : true,
-    "requireObjectDestructuring"                    : true,
+    "requireObjectDestructuring"                    : null,
     "requireObjectKeysOnNewLine" : {
         "allExcept" : [
             "sameLine"
         ]
     },
+    "verbose":true,
     "requireOperatorBeforeLineBreak"                : true,
     "requirePaddingNewLineAfterVariableDeclaration" : null,
-    "requirePaddingNewLinesAfterBlocks"             : true,
+    "requirePaddingNewLinesAfterBlocks" : {
+        "allExcept" : [
+            "inProperties"
+        ]
+    },
     "requirePaddingNewLinesAfterUseStrict"          : true,
     "requirePaddingNewLinesBeforeExport"            : true,
-    "requirePaddingNewlinesBeforeKeywords"          : true,
-    "requirePaddingNewLinesBeforeLineComments" : {
-        "allExcept" : "firstAfterCurly"
-    },
+    "requirePaddingNewlinesBeforeKeywords"          : null,
+    "requirePaddingNewLinesBeforeLineComments"      : null,
     "requirePaddingNewlinesInBlocks"                : null,
     "requirePaddingNewLinesInObjects"               : null,
     "requireParenthesesAroundArrowParam"            : true,
@@ -190,17 +192,37 @@
     "requireSpaceAfterKeywords"                     : true,
     "requireSpaceAfterLineComment"                  : true,
     "requireSpaceAfterObjectKeys"                   : true,
-    "requireSpaceAfterPrefixUnaryOperators"         : true,
+    "requireSpaceAfterPrefixUnaryOperators"         : null,
     "requireSpaceBeforeBinaryOperators"             : true,
     "requireSpaceBeforeBlockStatements"             : true,
     "requireSpaceBeforeComma"                       : null,
-    "requireSpaceBeforeKeywords"                    : true,
+    "requireSpaceBeforeKeywords" : [
+        "var",
+        "let",
+        "const",
+        "if",
+        "else",
+        "for",
+        "while",
+        "do",
+        "switch",
+        "case",
+        "default",
+        "delete",
+        "instanceof",
+        "try",
+        "catch",
+        "return"
+    ],
     "requireSpaceBeforeObjectValues"                : true,
     "requireSpaceBeforePostfixUnaryOperators"       : null,
     "requireSpaceBetweenArguments"                  : true,
     "requireSpacesInAnonymousFunctionExpression" : {
         "beforeOpeningRoundBrace" : true,
-        "beforeOpeningCurlyBrace" : true
+        "beforeOpeningCurlyBrace" : true,
+        "allExcept" : [
+            "shorthand"
+        ]
     },
     "requireSpacesInCallExpression"                 : null,
     "requireSpacesInConditionalExpression"          : true,
@@ -227,7 +249,11 @@
     "requireSpacesInsideParentheses"                : null,
     "requireSpacesInsideParenthesizedExpression"    : null,
     "requireSpread"                                 : true,
-    "requireTemplateStrings"                        : true,
+    "requireTemplateStrings" : {
+        "allExcept" : [
+            "stringConcatenation"
+        ]
+    },
     "requireTrailingComma"                          : null,
     "requireVarDeclFirst"                           : true,
     "requireYodaConditions"                         : null,
@@ -239,7 +265,7 @@
     "validateIndentation"                           : 4,
     "validateLineBreaks"                            : "LF",
     "validateNewlineAfterArrayElements"             : 8,
-    "validateOrderInObjectKeys"                     : "asc",
+    "validateOrderInObjectKeys"                     : null,
     "validateParameterSeparator"                    : ", ",
     "validateQuoteMarks"                            : "'"
 }
