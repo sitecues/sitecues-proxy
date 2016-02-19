@@ -1,9 +1,9 @@
 <script data-provider="sitecues-proxy" type="application/javascript">
-    // Production script injected via sitecues-proxy
+    // This loader can be used for testing sitecues locally
     var sitecues = window.sitecues = window.sitecues || {};
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    sitecues.config.scriptUrl = '//js.sitecues.com/l/s;id=' + sitecues.config.siteId + '/js/sitecues.js';
+    sitecues.config.scriptUrl = '//{{{JS_HOSTNAME}}}/js/sitecues.js';
     (function () {
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];
@@ -11,5 +11,5 @@
         script.async = true;
         script.src   = sitecues.config.scriptUrl;
         first.parentNode.insertBefore(script, first);
-    })();
+    })();        
 </script>

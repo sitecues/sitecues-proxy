@@ -10,6 +10,8 @@ A web server that sits between you and a website, to add or remove sitecues.
 **Documentation**: [The sitecues&reg; Proxy](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=36241450 "Documentation for the sitecues Proxy.")    
 **Author**: [Seth Holladay](http://seth-holladay.com "Personal website for Seth Holladay.")
 
+Note: simple instructions for testers here: https://equinox.atlassian.net/wiki/display/EN/Using+the+forward+proxy+to+test
+
 ## Installation
 
 Download the project.
@@ -41,16 +43,6 @@ Run the proxy on a desired port.
 PORT=8888 npm start
 ````
 
-Specify a hostname to associate the proxy with.
-````sh
-HOSTNAME=localhost npm start
-````
-
-Specify a complete `host` to associate the proxy with. Takes precedence over the less specific `hostname` or `port`.
-````sh
-HOST=localhost:8000 npm start
-````
-
 Control how quiet or noisy the proxy logs should be.
 ````sh
 LOG_LEVEL=debug npm start
@@ -65,27 +57,37 @@ VERBOSE=true npm start
 
 **The following options control the sitecues load script added to pages. They do not control the proxy itself.**
 
-Inject a specific branch.
+How to inject the loader script (default is replace)
 ````sh
-BRANCH=x-newpanel npm start
+LOADER_STRATEGY=keep      # Keep the original loader if present, otherwise append the new loader to the head. TODO should we remove?
+LOADER_STRATEGY=add       # Append the new loader to the head. Any old loaders are note removed -- they are kept where they were. Helpful for testing what happens when there are 2 sitecues scripts on the page.
+LOADER_STRATEGY=remove    # Remove the old loader and don't replace it -- strips out sitecues. Helpful for testing whether a bug is in the website itself or in sitecues.
+LOADER_STRATEGY=replace   # (default) Replace the old loader where is in the document
+
 ````
 
-Inject a specific release candidate, deployed by CI.
+Inject a specific load script such as config/local-loader.html (uses config/loader.html by default, for the latest production version)
 ````sh
-RELEASE=3.1.2 npm start
+LOADER_FILE=filename npm start
 ````
 
-Inject a specific development version, deployed by CI.
+Inject a specific branch and/or version (default BRANCH is dev. default VERSION is latest).
 ````sh
-DEV_VERSION=32.673 npm start
+LOADER_FILE=config/dev-loader.html BRANCH=(some branch name) VERSION=(some version number) npm start
 ````
 
-Load sitecues from the production servers.
+Inject a specific release candidate, deployed by CI (no default for VERSION).
 ````sh
-PRODUCTION=true npm start
+LOADER_FILE=config/release-loader.html VERSION=3.1.2 npm start
 ````
 
-Set the string used to identify customer sites.
+Specify a hostname to associate the proxy with (default JS_HOSTNAME is localhost).
+````sh
+LOADER_FILE=config/local-loader.html JS_HOSTNAME=localhost npm start
+````
+
+Set a specific string used to identify customer sites. 
+Otherwise, the site id will be scraped from the existing site. If none is found, then a default site id is used.
 ````sh
 SITE_ID=0000ee0c npm start
 ````
