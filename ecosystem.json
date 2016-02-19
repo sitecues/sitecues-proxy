@@ -47,7 +47,7 @@
             "user" : "proxy",
             "host" : "proxy.dev.sitecues.com",
             "repo" : "git@bitbucket.org:ai_squared/sitecues-proxy.git",
-            "ref"  : "origin/prototypal",
+            "ref"  : "origin/master",
             "path" : "/srv/sitecues-proxy",
             "post-deploy" : "npm install && pm2 startOrReload ecosystem.json --env dev"
         }
