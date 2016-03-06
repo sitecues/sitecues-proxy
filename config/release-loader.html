@@ -1,0 +1,21 @@
+<script data-provider="sitecues-proxy" type="application/javascript">
+    // Development script injected via sitecues-proxy
+    var sitecues = window.sitecues = window.sitecues || {},
+        // We need the major and minor version as a string, e.g. '4.0' from full version number '4.0.13'
+        rawVersion = '{{{RAWVERSION}}}',
+        releaseSplit = rawVersion.split('.'),
+        majorVer = releaseSplit[0],
+        minorVer = releaseSplit[1],
+        majMinVer = majorVer + '.' + minorVer;  
+    sitecues.config = sitecues.config || {};
+    sitecues.config.siteId = '{{{SITE_ID}}}';
+    sitecues.config.scriptUrl = '//js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/release-' + majMinVer + '/' + rawVersion + '-RELEASE/js/sitecues.js';
+    (function () {
+        var script = document.createElement('script'),
+            first  = document.getElementsByTagName('script')[0];
+        script.type  = 'application/javascript';
+        script.async = true;
+        script.src   = sitecues.config.scriptUrl;
+        first.parentNode.insertBefore(script, first);
+    })();
+</script>
