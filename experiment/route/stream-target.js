@@ -2,32 +2,61 @@
 
 const
     isRelativeUrl = require('url-type').isRelative,
+    zlib = require('zlib'),
     url = require('url'),
     Trumpet = require('trumpet'),
-    ROUTE_PREFIX = '/stream/';
-
-function assumeHttp(inputUrl) {
-
-    // This function is designed to modify a URL such that its protocol
-    // is http: if one is not already present.
-
-    return inputUrl.replace(/^(?!(?:\w+:)?\/\/)/, 'http://');
-}
-
-function toBypassedUrl(inputUrl) {
-    return inputUrl.substring(ROUTE_PREFIX.length);
-}
-
-function toProxiedPath(inputUrl) {
-    return ROUTE_PREFIX + inputUrl;
-}
-
-const
+    ROUTE_PREFIX = '/stream/',
+    htmlPattern = /html/i,
     redirectCodes = [
         // NOTE: Not all 3xx responses should be messed with.
         // For example: 304 Not Modified
         301, 302, 303, 307, 308
+    ],
+    // These headers will NOT be copied from the inResponse to the outResponse.
+    filteredResponseHeaders = [
+        // Hapi will negotiate this with the client for us.
+        'content-encoding',
+        // Hapi prefers chunked encoding, but also re-calculates size
+        // when necessary, which is important if we modify it.
+        'content-length',
+        // Hapi will negotiate this with the client for us.
+        'transfer-encoding'
     ];
+
+function assumeHttp(targetUrl) {
+
+    // This function is designed to modify a URL such that its protocol
+    // is http: if one is not already present.
+
+    return targetUrl.replace(/^(?!(?:\w+:)?\/\/)/, 'http://');
+}
+
+function getTargetUrl(requestPath) {
+    return requestPath.substring(ROUTE_PREFIX.length);
+}
+
+function toProxyPath(targetUrl) {
+    return ROUTE_PREFIX + targetUrl;
+}
+
+// Ensure that the client receives a reasonable representation
+// of what the target server sends back.
+function mapResponseData(from, to) {
+    const headers = from.headers;
+    for (const headerName in headers) {
+        const headerValue = headers[headerName];
+        if (filteredResponseHeaders.indexOf(headerName.toLowerCase()) >= 0) {
+            continue;
+        }
+        if (headerValue) {
+            to.header(headerName, headerValue);
+        }
+    }
+
+    to.code(from.statusCode);
+    // TODO: Figure out how to make the proxy respect statusMessage
+    //console.log('from statusMessage:', from.statusMessage);
+}
 
 module.exports = {
     method : '*',
@@ -49,7 +78,7 @@ module.exports = {
 
         // The target is taken from the path as-is, except for the inherent
         // leading slash. This includes a query string, if present.
-        const target = toBypassedUrl(inRequest.url.href);
+        const target = getTargetUrl(inRequest.url.href);
 
         // Deal with lazy users, favicon.ico requests, etc. where a protocol
         // and maybe even an origin, cannot be determined from the target.
@@ -58,7 +87,7 @@ module.exports = {
                 referrer = inRequest.info.referrer,
                 resolvedTarget = referrer ?
                     url.resolve(
-                        assumeHttp(toBypassedUrl(
+                        assumeHttp(getTargetUrl(
                             url.parse(referrer).path
                         )),
                         target
@@ -70,7 +99,7 @@ module.exports = {
             // referrer header. Otherwise we will lose track of the relevant origin
             // for the content.
 
-            reply.redirect(toProxiedPath(resolvedTarget)).rewritable(false);
+            reply.redirect(toProxyPath(resolvedTarget)).rewritable(false);
             return;
         }
 
@@ -78,9 +107,6 @@ module.exports = {
             uri : target,
             // Shovel headers between the client and target.
             passThrough : true,
-            // Strip the request header saying it is okay to encode the response.
-            // We want it unencoded so we can easily manipulate it.
-            acceptEncoding : false,
             // localStatePassThrough : true,
             onResponse : function (err, inResponse, inRequest, reply, settings, ttl) {
                 if (err) {
@@ -98,7 +124,7 @@ module.exports = {
                     // Re-write HTTP redirects to use the proxy.
                     // These can be relative, so we must resolve
                     // them from the original target.
-                    reply(inResponse).location(toProxiedPath(
+                    reply(inResponse).location(toProxyPath(
                         url.resolve(
                             target,
                             inResponse.headers.location
@@ -107,20 +133,44 @@ module.exports = {
                     return;
                 }
 
-                const outResponse = new Trumpet();
+                // Ensure we don't modify non-HTML responses.
+                //if (!htmlPattern.test(inResponse.headers['content-type'])) {
+                    // reply(inResponse);
+                    // return;
+                //}
 
-                outResponse.on('error', function (err) {
+                const encoding = inResponse.headers['content-encoding'];
+
+                let decoder;
+
+                if (encoding === 'gzip') {
+                    decoder = zlib.createGunzip();
+                }
+                else if (encoding === 'deflate') {
+                    decoder = zlib.createInflate();
+                }
+                else if (encoding) {
+                    throw new Error('Unknown encoding:', encoding);
+                }
+
+                const editor = new Trumpet();
+
+                editor.on('error', function (err) {
                     throw err;
                 });
 
-                const h1 = outResponse.createWriteStream('h1');
+                const h1 = editor.createWriteStream('h1');
                 h1.end('no one');
 
-                // Pass along useful information to our custom stream.
-                outResponse.headers = inResponse.headers;
+                const unencoded = decoder ? inResponse.pipe(decoder) : inResponse;
 
-                reply(outResponse);
-                inResponse.pipe(outResponse);
+                const page = unencoded.pipe(editor);
+
+                const outResponse = reply(page);
+
+                // Pass along response metadata from the upstream server,
+                // such as the Content-Type.
+                mapResponseData(inResponse, outResponse);
             }
         });
     }
