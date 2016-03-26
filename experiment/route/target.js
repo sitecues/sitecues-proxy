@@ -93,7 +93,9 @@ module.exports = {
                         )),
                         target
                     )
-                    : assumeHttp(target);
+                    // Resolving adds a trailing slash to domain root URLs,
+                    // which helps the client resolve page-relative URLs.
+                    : url.resolve('', assumeHttp(target));
 
             // We do a redirect rather than proxying to the resolved target so that
             // future requests for subresources within the content send us a useful
@@ -102,6 +104,17 @@ module.exports = {
 
             reply.redirect(toProxyPath(resolvedTarget)).rewritable(false);
             return;
+        }
+        // Targets like http://foo.com need to be redirected to http://foo.com/
+        // in order to help the client properly resolve subresources that use
+        // page-relative URLs. In other words, we need to make sure that the
+        // target is treated as a directory under the proxy.
+        else if (!target.endsWith('/')) {
+            const resolvedTarget = url.resolve('', target);
+            if (target !== resolvedTarget) {
+                reply.redirect(toProxyPath(resolvedTarget)).rewritable(false);
+                return;
+            }
         }
 
         reply.proxy({
@@ -146,10 +159,10 @@ module.exports = {
                 }
 
                 // Ensure we don't modify non-HTML responses.
-                //if (!htmlPattern.test(inResponse.headers['content-type'])) {
-                    // reply(inResponse);
-                    // return;
-                //}
+                if (!htmlPattern.test(inResponse.headers['content-type'])) {
+                    reply(inResponse);
+                    return;
+                }
 
                 const encoding = inResponse.headers['content-encoding'];
 
