@@ -5,6 +5,7 @@ const
     zlib = require('zlib'),
     url = require('url'),
     Trumpet = require('trumpet'),
+    boom = require('boom'),
     ROUTE_PREFIX = '/stream/',
     htmlPattern = /html/i,
     redirectCodes = [
@@ -90,7 +91,7 @@ module.exports = {
                         assumeHttp(getTargetUrl(
                             url.parse(referrer).path
                         )),
-                        target
+                        '/' + target
                     )
                     // Resolving adds a trailing slash to domain root URLs,
                     // which helps the client resolve page-relative URLs.
@@ -100,6 +101,14 @@ module.exports = {
             // future requests for subresources within the content send us a useful
             // referrer header. Otherwise we will lose track of the relevant origin
             // for the content.
+
+            if (!(url.parse(resolvedTarget).hostname)) {
+                const errMessage = resolvedTarget === 'http:///'
+                    ? 'A target is required, but was not provided'
+                    : 'An invalid target was provided (no hostname)';
+                reply(boom.badRequest(errMessage));
+                return;
+            }
 
             reply.redirect(toProxyPath(resolvedTarget)).rewritable(false);
             return;
