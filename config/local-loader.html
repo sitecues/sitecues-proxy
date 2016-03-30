@@ -4,6 +4,7 @@
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
     sitecues.config.scriptUrl = '//{{{JS_HOSTNAME}}}/js/sitecues.js';
+    sitecues.config.isTester = true;  // Metrics from this user can be filtered out by backend
     (function () {
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];
