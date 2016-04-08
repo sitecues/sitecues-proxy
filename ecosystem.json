@@ -45,7 +45,7 @@
             "env" : {
                 "DIRECTION" : "reverse",
                 "SITE_ID"   : "s-98595d91",
-                "PROXY_LINKS" : true
+                "PROXY_BASE" : true
             },
             "env_dev" : {
                 "HOSTNAME" : "proxy.dev.sitecues.com",
