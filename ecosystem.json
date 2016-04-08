@@ -37,7 +37,7 @@
             }
         },
         {
-            "name"   : "sitecues-rev-proxy-links",
+            "name"   : "sitecues-rev-proxy-base",
             "script" : "bin/sitecues-proxy.js",
             "exec_mode" : "cluster",
             "instances" : 2,
