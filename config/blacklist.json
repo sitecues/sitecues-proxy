@@ -1,3 +1,5 @@
 [
-    { "url" : "audioeye.", "flags" : "i" }
+    { "url" : "audioeye.", "flags" : "i" },
+    { "url" : "localhost/.*html/prefs.html", "flags" : "i" },
+    { "url" : "sitecues.com/.*/prefs.html", "flags" : "i" }
 ]
