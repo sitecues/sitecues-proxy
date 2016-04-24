@@ -5,19 +5,14 @@ process.on('unhandledRejection', (err) => {
 });
 
 const
-    isRelativeUrl = require('url-type').isRelative,
     hapi = require('hapi'),
-    cheerio = require('cheerio'),
     server = new hapi.Server(),
-    Trumpet = require('trumpet'),
-    wreck = require('wreck');
-
-// TODO: Use require-dir for cleaner importing of routes.
-const route = {
-    status : require('./route/status'),
-    streamTarget : require('./route/stream-target'),
-    target : require('./route/target')
-}
+    // TODO: Use require-dir for cleaner importing of routes.
+    route = {
+        status : require('./route/status'),
+        streamTarget : require('./route/stream-target'),
+        target : require('./route/target')
+    };
 
 server.connection({ port : 8001 });
 
@@ -27,7 +22,7 @@ server.register(
     {
         register : require('h2o2')
     },
-    function (err) {
+    (err) => {
 
         if (err) {
             throw err;
@@ -37,7 +32,7 @@ server.register(
 
         server.route(route.target);
 
-        server.start(function (err) {
+        server.start((err) => {
             if (err) {
                 throw err;
             }
