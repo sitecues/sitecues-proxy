@@ -44,14 +44,14 @@ function toProxyPath(targetUrl) {
 // Ensure that the client receives a reasonable representation
 // of what the target server sends back.
 function mapResponseData(from, to) {
-    const headers = from.headers;
-    for (const headerName in headers) {
-        const headerValue = headers[headerName];
-        if (filteredResponseHeaders.indexOf(headerName.toLowerCase()) >= 0) {
+    const header = from.headers;
+    for (const name in header) {
+        const value = header[name];
+        if (filteredResponseHeaders.indexOf(name.toLowerCase()) >= 0) {
             continue;
         }
-        if (headerValue) {
-            to.header(headerName, headerValue);
+        if (value) {
+            to.header(name, value);
         }
     }
 
@@ -69,14 +69,14 @@ module.exports = {
             space : 4
         },
         // Workaround the fact that reply.proxy() does not work with the
-        // default stream and parse config.
+        // default output and parse config.
         // https://github.com/hapijs/hapi/issues/2647
         payload : {
             output : 'stream',
             parse : false
         }
     },
-    handler : function (inRequest, reply) {
+    handler : function onRequest(inRequest, reply) {
 
         // The target is taken from the path as-is, except for the inherent
         // leading slash. This includes a query string, if present.
@@ -88,28 +88,31 @@ module.exports = {
             const
                 referrer = inRequest.info.referrer,
                 resolvedTarget = referrer ?
-                    url.resolve(
-                        assumeHttp(getTargetUrl(
-                            url.parse(referrer).path
-                        )),
-                        '/' + target
-                    )
-                    // Resolving adds a trailing slash to domain root URLs,
-                    // which helps the client resolve page-relative URLs.
-                    : url.resolve('', assumeHttp(target));
+                        url.resolve(
+                            assumeHttp(getTargetUrl(
+                                url.parse(referrer).path
+                            )),
+                            '/' + target
+                        )
+                    :
+                        // Resolving adds a trailing slash to domain root URLs,
+                        // which helps the client resolve page-relative URLs.
+                        url.resolve('', assumeHttp(target));
+
+            if (!(url.parse(resolvedTarget).hostname)) {
+                reply(boom.badRequest(
+                    resolvedTarget === 'http:///' ?
+                            'A target is required, but was not provided'
+                        :
+                            'An invalid target was provided (no hostname)'
+                ));
+                return;
+            }
 
             // We do a redirect rather than proxying to the resolved target so that
             // future requests for subresources within the content send us a useful
             // referrer header. Otherwise we will lose track of the relevant origin
             // for the content.
-
-            if (!(url.parse(resolvedTarget).hostname)) {
-                const errMessage = resolvedTarget === 'http:///'
-                    ? 'A target is required, but was not provided'
-                    : 'An invalid target was provided (no hostname)';
-                reply(boom.badRequest(errMessage));
-                return;
-            }
 
             reply.redirect(toProxyPath(resolvedTarget)).rewritable(false);
             return;
@@ -126,12 +129,26 @@ module.exports = {
             }
         }
 
+        {
+            const parsedTarget = url.parse(target);
+
+            if (!parsedTarget.protocol) {
+                reply(boom.badRequest('An invalid target was provided (no protocol)'));
+                return;
+            }
+
+            if (!parsedTarget.hostname) {
+                reply(boom.badRequest('An invalid target was provided (no hostname)'));
+                return;
+            }
+        }
+
         reply.proxy({
             uri : target,
             // Shovel headers between the client and target.
             passThrough : true,
             // localStatePassThrough : true,
-            onResponse : function (err, inResponse, inRequest, reply, settings) {
+            onResponse : (err, inResponse, inRequest, reply, settings) => {
                 // console.log('inResponse keys:');
                 // for (let key in inResponse) {
                 //     console.log(' ', key, ':', typeof inResponse[key]);
@@ -193,7 +210,7 @@ module.exports = {
                 const bufferingOptions = {
                     timeout : 30000
                 };
-                wreck.read(unencoded, bufferingOptions, function (err, buffer) {
+                wreck.read(unencoded, bufferingOptions, (err, buffer) => {
 
                     if (err) {
                         throw err;
@@ -208,7 +225,7 @@ module.exports = {
 
                     // console.log('Bytes:', Buffer.byteLength(page));
 
-                    const outResponse = reply(page);
+                    const outResponse = reply(buffer.toString());
 
                     // Pass along response metadata from the upstream server,
                     // such as the Content-Type.
