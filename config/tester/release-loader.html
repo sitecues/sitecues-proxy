@@ -17,6 +17,7 @@
             first  = document.getElementsByTagName('script')[0];
         script.type  = 'application/javascript';
         script.src   = sitecues.config.scriptUrl;
+        script.setAttribute('crossorigin', 'anonymous')
         first.parentNode.insertBefore(script, first);
     })();
 </script>
