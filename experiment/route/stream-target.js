@@ -68,7 +68,7 @@ module.exports = {
             space : 4
         },
         // Workaround the fact that reply.proxy() does not work with the
-        // default stream and parse config.
+        // default output and parse config.
         // https://github.com/hapijs/hapi/issues/2647
         payload : {
             output : 'stream',

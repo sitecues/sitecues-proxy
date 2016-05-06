@@ -149,14 +149,7 @@ module.exports = {
             passThrough : true,
             // localStatePassThrough : true,
             onResponse : (err, inResponse, inRequest, reply, settings) => {
-                // console.log('inResponse keys:');
-                // for (let key in inResponse) {
-                //     console.log(' ', key, ':', typeof inResponse[key]);
-                // }
-                // console.log('upgrade:', inResponse.upgrade);
-                // console.log('statusCode:', inResponse.statusCode);
-                // console.log('statusMessage:', inResponse.statusMessage);
-                // console.log('target:', settings.uri);
+
                 if (err) {
                     // Modify errors to be more clear and user friendly.
                     if (err.code === 'ENOTFOUND') {
