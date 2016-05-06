@@ -47,7 +47,7 @@ function mapResponseData(from, to) {
     const header = from.headers;
     for (const name in header) {
         const value = header[name];
-        if (filteredResponseHeaders.indexOf(name.toLowerCase()) >= 0) {
+        if (filteredResponseHeaders.includes(name.toLowerCase())) {
             continue;
         }
         if (value) {
@@ -171,7 +171,7 @@ module.exports = {
 
                 // Detect HTTP redirect responses, which would send
                 // the user away from the proxy.
-                if (redirectCodes.indexOf(inResponse.statusCode) >= 0) {
+                if (redirectCodes.includes(inResponse.statusCode)) {
                     // Re-write HTTP redirects to use the proxy.
                     // These can be relative, so we must resolve
                     // them from the original target.
