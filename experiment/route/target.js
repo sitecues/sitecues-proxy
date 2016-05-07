@@ -4,7 +4,7 @@ const
     url = require('url'),
     zlib = require('zlib'),
     isRelativeUrl = require('url-type').isRelative,
-    cheerio = require('cheerio'),
+    pageEditor = require('../page-editor'),
     boom = require('boom'),
     wreck = require('wreck'),
     ROUTE_PREFIX = '/',
@@ -124,14 +124,9 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
             throw err;
         }
 
-        const $ = cheerio.load(buffer.toString());
+        const page = pageEditor.editPage(buffer);
 
-        $('h1').text('no way');
-
-        // TODO: Support XML via $.xml() and Content-Type header sniffing, same as hoxy.
-        const page = $.html();
-
-        const outResponse = reply(buffer.toString());
+        const outResponse = reply(page);
 
         // Pass along response metadata from the upstream server,
         // such as the Content-Type.
