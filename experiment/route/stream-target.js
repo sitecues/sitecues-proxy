@@ -24,11 +24,9 @@ const
         'transfer-encoding'
     ];
 
+// Modify a URL such that its protocol is http: if one
+// is not already present.
 function assumeHttp(targetUrl) {
-
-    // This function is designed to modify a URL such that its protocol
-    // is http: if one is not already present.
-
     return targetUrl.replace(/^(?!(?:\w+:)?\/\/)/, 'http://');
 }
 
@@ -43,7 +41,9 @@ function toProxyPath(targetUrl) {
 // Ensure that the client receives a reasonable representation
 // of what the target server sends back.
 function mapResponseData(from, to) {
+
     const header = from.headers;
+
     for (const name in header) {
         const value = header[name];
         if (filteredResponseHeaders.includes(name.toLowerCase())) {
@@ -140,6 +140,7 @@ function onRequest(inRequest, reply) {
     // Deal with lazy users, favicon.ico requests, etc. where a protocol
     // and maybe even an origin, cannot be determined from the target.
     if (isRelativeUrl(target)) {
+
         const
             referrer = inRequest.info.referrer,
             resolvedTarget = referrer ?

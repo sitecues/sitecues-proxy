@@ -10,8 +10,8 @@ const
     // TODO: Use require-dir for cleaner importing of routes.
     route = {
         status : require('./route/status'),
-        streamTarget : require('./route/stream-target'),
-        target : require('./route/target')
+        target : require('./route/target'),
+        streamTarget : require('./route/stream-target')
     };
 
 server.connection({ port : 8001 });
@@ -28,14 +28,16 @@ server.register(
             throw err;
         }
 
-        server.route(route.streamTarget);
-
         server.route(route.target);
 
+        server.route(route.streamTarget);
+
         server.start((err) => {
+
             if (err) {
                 throw err;
             }
+
             console.log('Reverse proxy available at:', server.info.uri);
         });
     }
