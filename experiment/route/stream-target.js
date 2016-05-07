@@ -1,9 +1,9 @@
 'use strict';
 
 const
-    isRelativeUrl = require('url-type').isRelative,
-    zlib = require('zlib'),
     url = require('url'),
+    zlib = require('zlib'),
+    isRelativeUrl = require('url-type').isRelative,
     Trumpet = require('trumpet'),
     boom = require('boom'),
     ROUTE_PREFIX = '/stream/',

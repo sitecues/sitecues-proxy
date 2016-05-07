@@ -1,9 +1,9 @@
 'use strict';
 
 const
-    isRelativeUrl = require('url-type').isRelative,
-    zlib = require('zlib'),
     url = require('url'),
+    zlib = require('zlib'),
+    isRelativeUrl = require('url-type').isRelative,
     cheerio = require('cheerio'),
     boom = require('boom'),
     wreck = require('wreck'),
