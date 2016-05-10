@@ -203,7 +203,6 @@ function onRequest(inRequest, reply) {
         uri : target,
         // Shovel headers between the client and target.
         passThrough : true,
-        // localStatePassThrough : true,
         onResponse
     });
 }
