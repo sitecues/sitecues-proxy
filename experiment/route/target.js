@@ -8,7 +8,6 @@ const
     boom = require('boom'),
     wreck = require('wreck'),
     ROUTE_PREFIX = '/',
-    htmlPattern = /html/i,
     redirectCodes = [
         // NOTE: Not all 3xx responses should be messed with.
         // For example: 304 Not Modified
@@ -92,8 +91,10 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
         return;
     }
 
+    const contentType = (inResponse.headers['content-type'] || '').toLowerCase();
+
     // Ensure we don't modify non-HTML responses.
-    if (!htmlPattern.test(inResponse.headers['content-type'])) {
+    if (!contentType || !contentType.includes('html')) {
         reply(inResponse);
         return;
     }
@@ -124,9 +125,10 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
             throw err;
         }
 
-        const page = pageEditor.editPage(buffer);
-
-        const outResponse = reply(page);
+        const
+            xmlMode = contentType.includes('xml'),
+            page = pageEditor.editPage(buffer, { xmlMode }),
+            outResponse = reply(page);
 
         // Pass along response metadata from the upstream server,
         // such as the Content-Type.

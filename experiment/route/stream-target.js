@@ -7,7 +7,6 @@ const
     Trumpet = require('trumpet'),
     boom = require('boom'),
     ROUTE_PREFIX = '/stream/',
-    htmlPattern = /html/i,
     redirectCodes = [
         // NOTE: Not all 3xx responses should be messed with.
         // For example: 304 Not Modified
@@ -91,8 +90,10 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
         return;
     }
 
+    const contentType = inResponse.headers['content-type'];
+
     // Ensure we don't modify non-HTML responses.
-    if (!htmlPattern.test(inResponse.headers['content-type'])) {
+    if (!contentType || !contentType.toLowerCase().includes('html')) {
         reply(inResponse);
         return;
     }
@@ -120,11 +121,10 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
     const h1 = editor.createWriteStream('h1');
     h1.end('no one');
 
-    const unencoded = decoder ? inResponse.pipe(decoder) : inResponse;
-
-    const page = unencoded.pipe(editor);
-
-    const outResponse = reply(page);
+    const
+        unencoded = decoder ? inResponse.pipe(decoder) : inResponse,
+        page = unencoded.pipe(editor),
+        outResponse = reply(page);
 
     // Pass along response metadata from the upstream server,
     // such as the Content-Type.

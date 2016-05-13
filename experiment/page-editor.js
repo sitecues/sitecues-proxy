@@ -6,14 +6,17 @@
 const
     cheerio = require('cheerio');
 
-function editPage(page) {
+function editPage(page, option) {
 
-    const $ = cheerio.load(page);
+    const
+        xmlMode = option.xmlMode,
+        $ = cheerio.load(page, { xmlMode });
 
-    // Fix the Google logo on their homepage.
-    $('meta[name=referrer]').attr('content', function (index, value) {
-        // Ensure that the proxy can see the full URL of referrals to itself,
-        // so that it can fully resolve relative targets.
+    // Ensure that the proxy can see the full URL of referrals to itself,
+    // so that it can fully resolve relative targets. This fixes the
+    // Google logo on their homepage.
+    $('meta[name=referrer]').attr('content', (index, value) => {
+
         if (value === 'none' || value === 'origin') {
             return 'origin-when-crossorigin';
         }
@@ -23,8 +26,7 @@ function editPage(page) {
 
     $('h1').text('no way');
 
-    // TODO: Support XML via $.xml() and Content-Type header sniffing, same as hoxy.
-    return $.html();
+    return xmlMode ? $.xml() : $.html();
 }
 
 module.exports = {
