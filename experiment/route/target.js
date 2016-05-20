@@ -46,12 +46,11 @@ function mapResponseData(from, to) {
 
     for (const name in header) {
         const value = header[name];
-        if (filteredResponseHeaders.includes(name.toLowerCase())) {
+        if (!value || filteredResponseHeaders.includes(name.toLowerCase())) {
             continue;
         }
-        if (value) {
-            to.header(name, value);
-        }
+
+        to.header(name, value);
     }
 
     to.code(from.statusCode);
