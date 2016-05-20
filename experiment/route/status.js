@@ -2,14 +2,14 @@
 
 const
     alignJson = require('json-align'),
-    pkg = require('read-pkg-up').sync().pkg,  // find + parse package.json
+    pkg = require('read-pkg-up').sync().pkg,
     APP_NAME = pkg.name,
     VERSION  = pkg.version;
 
 module.exports = {
     method : 'GET',
-    path   : '/sitecuesProxyStatus',
-    handler : function (request, reply) {
+    path   : `/__${APP_NAME}/status`,
+    handler(request, reply) {
 
         const status = {
             app        : APP_NAME,

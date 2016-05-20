@@ -7,9 +7,9 @@ const
     Trumpet = require('trumpet'),
     boom = require('boom'),
     ROUTE_PREFIX = '/stream/',
+    // NOTE: Not all 3xx responses should be messed with.
+    // For example, 304 Not Modified.
     redirectCodes = [
-        // NOTE: Not all 3xx responses should be messed with.
-        // For example: 304 Not Modified
         301, 302, 303, 307, 308
     ],
     // Headers that will NOT be copied from the inResponse to the outResponse.
@@ -71,15 +71,13 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
         throw err;
     }
 
-    // Detect HTTP redirect responses, which would send
-    // the user away from the proxy.
+    // Fix HTTP redirects, which would kick the user out of the proxy.
     if (redirectCodes.includes(inResponse.statusCode)) {
 
         const target = settings.uri;
 
-        // Re-write HTTP redirects to use the proxy.
-        // These can be relative, so we must resolve
-        // them from the original target.
+        // Re-write redirect URLs to use the proxy. These can be relative,
+        // so we must resolve them from the original target.
         reply(inResponse).location(toProxyPath(
             url.resolve(
                 target,
@@ -132,8 +130,7 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
 
 function onRequest(inRequest, reply) {
 
-    // The target is taken from the path as-is, except for the inherent
-    // leading slash. This includes a query string, if present.
+    // The user's desired URL to visit.
     const target = getTargetUrl(inRequest.url.href);
 
     // Deal with lazy users, favicon.ico requests, etc. where a protocol
@@ -214,8 +211,7 @@ module.exports = {
         json : {
             space : 4
         },
-        // Workaround the fact that reply.proxy() does not work with the
-        // default output and parse config.
+        // Workaround reply.proxy() not supporting the default payload config.
         // https://github.com/hapijs/hapi/issues/2647
         payload : {
             output : 'stream',
