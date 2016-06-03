@@ -9,7 +9,7 @@ const
 function editPage(page, option) {
 
     const
-        xmlMode = option.xmlMode,
+        { xmlMode } = option,
         $ = cheerio.load(page, { xmlMode });
 
     // Ensure that the proxy can see the full URL of referrals to itself,

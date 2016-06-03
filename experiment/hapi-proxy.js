@@ -11,9 +11,7 @@ const
 server.connection({ port : 8001 });
 
 server.register(
-    {
-        register : require('h2o2')
-    },
+    require('h2o2'),
     (err) => {
 
         if (err) {
