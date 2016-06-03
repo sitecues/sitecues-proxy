@@ -4,7 +4,6 @@
 
 'use strict';
 
-// Use the main module in the package.json manifest to get a hold of the API.
 const
     server = require('../').createServer(),
     chalk = require('chalk'),
@@ -13,15 +12,30 @@ const
     log = require('../lib/log');
 
 // Crash and burn, die fast if a rejected promise is not caught.
-process.on('unhandledRejection', function (err) {
+process.on('unhandledRejection', (err) => {
     throw err;
 });
 
-server.init()
-    .then(function () {
-        return server.listen();
+let cancelled = false;
+
+process.on('SIGINT', () => {
+
+    if (cancelled) {
+        console.warn('\nShutting down immediately. You monster!');
+        process.exit(1);
+    }
+
+    cancelled = true;
+
+    console.warn('\nShutting down. Please wait or hit CTRL+C to force quit.');
+
+    server.stop();
+});
+
+server.init().then(() => {
+        return server.start();
     })
-    .then(function (server) {
+    .then((server) => {
         // Attempt to set UID to a normal user now that we definitely
         // do not need elevated privileges.
         rootCheck(
