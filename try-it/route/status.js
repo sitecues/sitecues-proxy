@@ -2,9 +2,9 @@
 
 const
     alignJson = require('json-align'),
-    pkg = require('read-pkg-up').sync().pkg,
-    APP_NAME = pkg.name,
-    VERSION  = pkg.version;
+    pkg       = require('read-pkg-up').sync({cwd:__dirname}).pkg,
+    APP_NAME  = pkg.name,
+    VERSION   = pkg.version;
 
 module.exports = {
     method : 'GET',
