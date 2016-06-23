@@ -7,8 +7,8 @@ Set up the directory structure for the root CA.
 ```sh
 mkdir root-ca;
 cd root-ca;
-mkdir private cert crl newcert;
-chmod 700 private;
+mkdir key cert crl newcert;
+chmod 700 key;
 touch index.txt;
 echo 1000 > serial;
 ```
@@ -23,8 +23,8 @@ nano openssl.conf;
 Create a private key for the root CA.
 
 ```sh
-openssl genrsa -aes256 -out private/ca.key.pem 4096;
-chmod 400 private/ca.key.pem;
+openssl genrsa -aes256 -out key/ca.key.pem 4096;
+chmod 400 key/ca.key.pem;
 ```
 
 Create a self-signed public certificate for the root CA.
@@ -32,7 +32,7 @@ Create a self-signed public certificate for the root CA.
 ```sh
 openssl req -config openssl.conf \
       -new -x509 -days 7300 -sha512 -extensions v3_ca \
-      -key private/ca.key.pem \
+      -key key/ca.key.pem \
       -out cert/ca.cert.pem;
 chmod 444 cert/ca.cert.pem;
 ```
@@ -48,8 +48,8 @@ Set up the directory structure for the intermediate CA.
 ```sh
 mkdir ../intermediate-ca;
 cd ../intermediate-ca;
-mkdir private csr cert crl newcert;
-chmod 700 private;
+mkdir key csr cert crl newcert;
+chmod 700 key;
 touch index.txt;
 echo 1000 > serial;
 echo 1000 > crlnumber;
@@ -65,15 +65,15 @@ nano openssl.conf;
 Create a private key for the intermediate CA.
 
 ```sh
-openssl genrsa -aes256 -out private/intermediate.key.pem 4096;
-chmod 400 private/intermediate.key.pem;
+openssl genrsa -aes256 -out key/intermediate.key.pem 4096;
+chmod 400 key/intermediate.key.pem;
 ```
 
 Create a temporary CSR file that will help the root CA create a public certificate for the intermediate CA.
 
 ```sh
 openssl req -config openssl.conf -new -sha256 \
-      -key private/intermediate.key.pem \
+      -key key/intermediate.key.pem \
       -out csr/intermediate.csr.pem;
 ```
 
@@ -122,23 +122,23 @@ Set up the directory structure for the server.
 ```sh
 mkdir ../server;
 cd ../server;
-mkdir private csr cert;
-chmod 700 private;
+mkdir key csr cert;
+chmod 700 key;
 ```
 
 Create the server's private key. You can avoid adding a password by omitting the "-aes256" flag.
 
 ```sh
 openssl genrsa -aes256 \
-      -out private/localhost.key.pem 4096;
-chmod 400 private/localhost.key.pem;
+      -out key/localhost.key.pem 4096;
+chmod 400 key/localhost.key.pem;
 ```
 
 Create a temporary CSR file that will help the intermediate CA create a public certificate for the server.
 
 ```sh
 openssl req -config ../intermediate-ca/openssl.conf \
-      -key private/localhost.key.pem \
+      -key key/localhost.key.pem \
       -new -sha512 -out csr/localhost.csr.pem;
 ```
 
