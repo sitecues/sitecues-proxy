@@ -1,4 +1,4 @@
-# Create a PKI chain.
+# Create a PKI chain
 
 > Root CA => Intermediate CA => Server
 
@@ -7,7 +7,7 @@ Set up the directory structure for the root CA.
 ```sh
 mkdir root-ca;
 cd root-ca;
-mkdir private certs crl newcerts;
+mkdir private cert crl newcert;
 chmod 700 private;
 touch index.txt;
 echo 1000 > serial;
@@ -31,16 +31,16 @@ Create a self-signed public certificate for the root CA.
 
 ```sh
 openssl req -config openssl.conf \
+      -new -x509 -days 7300 -sha512 -extensions v3_ca \
       -key private/ca.key.pem \
-      -new -x509 -days 7300 -sha256 -extensions v3_ca \
-      -out certs/ca.cert.pem;
-chmod 444 certs/ca.cert.pem;
+      -out cert/ca.cert.pem;
+chmod 444 cert/ca.cert.pem;
 ```
 
 Check the root CA's public certificate details.
 
 ```sh
-openssl x509 -noout -text -in certs/ca.cert.pem;
+openssl x509 -noout -text -in cert/ca.cert.pem;
 ```
 
 Set up the directory structure for the intermediate CA.
@@ -48,7 +48,7 @@ Set up the directory structure for the intermediate CA.
 ```sh
 mkdir ../intermediate-ca;
 cd ../intermediate-ca;
-mkdir private csr certs crl newcerts;
+mkdir private csr cert crl newcert;
 chmod 700 private;
 touch index.txt;
 echo 1000 > serial;
@@ -85,10 +85,10 @@ Create the intermediate CA's public certificate, based on its CSR.
 
 ```sh
 openssl ca -config openssl.conf -extensions v3_intermediate_ca \
-      -days 3650 -notext -md sha256 \
+      -days 3650 -notext -md sha512 \
       -in ../intermediate-ca/csr/intermediate.csr.pem \
-      -out ../intermediate-ca/certs/intermediate.cert.pem;
-chmod 444 ../intermediate-ca/certs/intermediate.cert.pem;
+      -out ../intermediate-ca/cert/intermediate.cert.pem;
+chmod 444 ../intermediate-ca/cert/intermediate.cert.pem;
 ```
 
 ```sh
@@ -99,22 +99,22 @@ Check the intermediate CA's public certificate details.
 
 ```sh
 openssl x509 -noout -text \
-      -in certs/intermediate.cert.pem;
+      -in cert/intermediate.cert.pem;
 ```
 
 Verify the integrity of the intermediate CA's public certificate.
 
 ```sh
-openssl verify -CAfile ../root-ca/certs/ca.cert.pem \
-      certs/intermediate.cert.pem;
+openssl verify -CAfile ../root-ca/cert/ca.cert.pem \
+      cert/intermediate.cert.pem;
 ```
 
 Create the intermediate CA's public certificate chain file.
 
 ```sh
-cat certs/intermediate.cert.pem \
-      ../root-ca/certs/ca.cert.pem > certs/ca-chain.cert.pem;
-chmod 444 certs/ca-chain.cert.pem;
+cat cert/intermediate.cert.pem \
+      ../root-ca/cert/ca.cert.pem > cert/ca-chain.cert.pem;
+chmod 444 cert/ca-chain.cert.pem;
 ```
 
 Set up the directory structure for the server.
@@ -122,7 +122,7 @@ Set up the directory structure for the server.
 ```sh
 mkdir ../server;
 cd ../server;
-mkdir private csr certs;
+mkdir private csr cert;
 chmod 700 private;
 ```
 
@@ -139,7 +139,7 @@ Create a temporary CSR file that will help the intermediate CA create a public c
 ```sh
 openssl req -config ../intermediate-ca/openssl.conf \
       -key private/localhost.key.pem \
-      -new -sha256 -out csr/localhost.csr.pem;
+      -new -sha512 -out csr/localhost.csr.pem;
 ```
 
 ```sh
@@ -150,10 +150,10 @@ Create the server's public certificate, based on its CSR.
 
 ```sh
 openssl ca -config openssl.conf \
-      -extensions server_cert -days 375 -notext -md sha256 \
+      -extensions server_cert -days 375 -notext -md sha512 \
       -in ../server/csr/localhost.csr.pem \
-      -out ../server/certs/localhost.cert.pem;
-chmod 444 ../server/certs/localhost.cert.pem;
+      -out ../server/cert/localhost.cert.pem;
+chmod 444 ../server/cert/localhost.cert.pem;
 ```
 
 ```sh
@@ -164,12 +164,12 @@ Check the server's public certificate details.
 
 ```sh
 openssl x509 -noout -text \
-      -in certs/localhost.cert.pem;
+      -in cert/localhost.cert.pem;
 ```
 
 Verify the integrity of the server's public certificate.
 
 ```sh
-openssl verify -CAfile ../intermediate-ca/certs/ca-chain.cert.pem \
-      certs/localhost.cert.pem;
+openssl verify -CAfile ../intermediate-ca/cert/ca-chain.cert.pem \
+      cert/localhost.cert.pem;
 ```
