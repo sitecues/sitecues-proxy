@@ -1,37 +1,47 @@
 'use strict';
 
-process.on('unhandledRejection', (err) => {
-    throw err;
-});
+const {Server} = require('hapi');
 
-const
-    hapi = require('hapi'),
-    server = new hapi.Server();
+class ReverseProxy extends Server {
 
-server.connection({ port : 8001 });
+    constructor(option) {
 
-server.register(
-    require('h2o2'),
-    (err) => {
+        option = Object.assign({ port : 8001 }, option);
 
-        if (err) {
-            throw err;
-        }
+        super();
+        super.connection({ port : option.port });
+    }
 
-        // TODO: Import all from directory, like require-dir.
-        server.route([
-            require('./route/status'),
-            require('./route/target'),
-            require('./route/stream-target')
-        ]);
+    start() {
+        return super.register(require('h2o2')).then(() => {
 
-        server.start((err) => {
+            // TODO: Import all from directory, like require-dir.
+            super.route([
+                require('./route/status'),
+                require('./route/target'),
+                require('./route/stream-target')
+            ]);
 
-            if (err) {
-                throw err;
-            }
+            // TODO: Simply return the promise once hapijs/hapi#3217 is resolved.
+            // https://github.com/hapijs/hapi/issues/3217
 
-            console.log('Reverse proxy available at:', server.info.uri);
+            // return super.start();
+
+            return new Promise((resolve, reject) => {
+                super.start((err) => {
+
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    resolve();
+                });
+            });
         });
     }
-);
+}
+
+module.exports = {
+    ReverseProxy
+};
