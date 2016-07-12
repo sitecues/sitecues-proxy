@@ -3,20 +3,16 @@
 
 'use strict';
 
-const
-    cheerio = require('cheerio');
+const cheerio = require('cheerio');
 
 function editPage(page, option) {
-
-    const
-        { xmlMode } = option,
-        $ = cheerio.load(page, { xmlMode });
+    const { xmlMode } = option;
+    const $ = cheerio.load(page, { xmlMode });
 
     // Ensure that the proxy can see the full URL of referrals to itself,
     // so that it can fully resolve relative targets. This fixes the
     // Google logo on their homepage.
     $('meta[name=referrer]').attr('content', (index, value) => {
-
         if (value === 'none' || value === 'origin') {
             return 'origin-when-crossorigin';
         }

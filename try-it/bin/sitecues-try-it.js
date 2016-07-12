@@ -30,13 +30,16 @@ const cli = require('meow')(`
 const serverOptions = Object.assign({}, cli.flags);
 delete serverOptions.target;
 
-const {ReverseProxy} = require('../');
+const open = require('opn');
+const assumeHttp = require('prepend-http');
+const rootCheck = require('root-check');
+const { ReverseProxy } = require('../');
+
 const server = new ReverseProxy(serverOptions);
 
 let cancelled = false;
 
 process.on('SIGINT', () => {
-
     if (cancelled) {
         console.warn('\nShutting down immediately. You monster!');
         process.exit(1);
@@ -49,11 +52,9 @@ process.on('SIGINT', () => {
     server.stop();
 });
 
-const open = require('opn');
-const assumeHttp = require('prepend-http');
-const rootCheck = require('root-check');
-const {SecurityError} = require('../../lib/error');
-const {target} = cli.flags;
+const { SecurityError } = require('../../lib/error');
+
+const { target } = cli.flags;
 
 server.start().then(() => {
     // Attempt to set UID to a normal user now that we definitely
