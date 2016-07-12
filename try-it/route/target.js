@@ -14,7 +14,7 @@ const
         301, 302, 303, 307, 308
     ],
     // Headers that will NOT be copied from the inResponse to the outResponse.
-    filteredResponseHeaders = [
+    ignoredResponseHeaders = [
         // Hapi will negotiate this with the client for us.
         'content-encoding',
         // Hapi prefers chunked encoding, but also re-calculates size
@@ -41,17 +41,13 @@ function toProxyPath(targetUrl) {
 // Ensure that the client receives a reasonable representation
 // of what the target server sends back.
 function mapResponseData(from, to) {
+    const {headers} = from;
 
-    const header = from.headers;
-
-    for (const name in header) {
-        const value = header[name];
-        if (!value || filteredResponseHeaders.includes(name.toLowerCase())) {
-            continue;
-        }
-
-        to.header(name, value);
-    }
+    Object.keys(headers).filter((name) => {
+        return headers[name] && !ignoredResponseHeaders.includes(name.toLowerCase());
+    }).forEach((name) => {
+        to.header(name, headers[name]);
+    });
 
     to.code(from.statusCode);
     // TODO: Figure out how to make the proxy respect statusMessage
