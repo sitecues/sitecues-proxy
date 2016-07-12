@@ -44,6 +44,7 @@
     "read-pkg-up": "1.0.1",
     "root-check": "1.0.0",
     "throw-rejects": "0.1.0",
+    "trumpet": "1.7.2",
     "url-type": "0.1.1"
   },
   "devDependencies": {
