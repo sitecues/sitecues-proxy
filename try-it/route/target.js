@@ -1,47 +1,47 @@
 'use strict';
 
-const
-    url = require('url'),
-    zlib = require('zlib'),
-    isRelativeUrl = require('url-type').isRelative,
-    pageEditor = require('../page-editor'),
-    boom = require('boom'),
-    wreck = require('wreck'),
-    ROUTE_PREFIX = '/',
-    // NOTE: Not all 3xx responses should be messed with.
-    // For example, 304 Not Modified.
-    redirectCodes = [
-        301, 302, 303, 307, 308
-    ],
-    // Headers that will NOT be copied from the inResponse to the outResponse.
-    ignoredResponseHeaders = [
-        // Hapi will negotiate this with the client for us.
-        'content-encoding',
-        // Hapi prefers chunked encoding, but also re-calculates size
-        // when necessary, which is important if we modify it.
-        'content-length',
-        // Hapi will negotiate this with the client for us.
-        'transfer-encoding'
-    ];
+const url = require('url');
+const zlib = require('zlib');
+const isRelativeUrl = require('url-type').isRelative;
+const boom = require('boom');
+const wreck = require('wreck');
+const pageEditor = require('../page-editor');
+
+const routePrefix = '/';
+// NOTE: Not all 3xx responses should be messed with.
+// For example, 304 Not Modified.
+const redirectCodes = [
+    301, 302, 303, 307, 308
+];
+// Headers that will NOT be copied from the inResponse to the outResponse.
+const ignoredResponseHeaders = [
+    // Hapi will negotiate this with the client for us.
+    'content-encoding',
+    // Hapi prefers chunked encoding, but also re-calculates size
+    // when necessary, which is important if we modify it.
+    'content-length',
+    // Hapi will negotiate this with the client for us.
+    'transfer-encoding'
+];
 
 // Modify a URL such that its protocol is http: if one
 // is not already present.
-function assumeHttp(targetUrl) {
+const assumeHttp = (targetUrl) => {
     return targetUrl.replace(/^(?!(?:\w+:)?\/\/)/, 'http://');
-}
+};
 
-function getTargetUrl(requestPath) {
-    return requestPath.substring(ROUTE_PREFIX.length);
-}
+const getTargetUrl = (requestPath) => {
+    return requestPath.substring(routePrefix.length);
+};
 
-function toProxyPath(targetUrl) {
-    return ROUTE_PREFIX + targetUrl;
-}
+const toProxyPath = (targetUrl) => {
+    return routePrefix + targetUrl;
+};
 
 // Ensure that the client receives a reasonable representation
 // of what the target server sends back.
-function mapResponseData(from, to) {
-    const {headers} = from;
+const mapResponseData = (from, to) => {
+    const { headers } = from;
 
     Object.keys(headers).filter((name) => {
         return headers[name] && !ignoredResponseHeaders.includes(name.toLowerCase());
@@ -52,10 +52,11 @@ function mapResponseData(from, to) {
     to.code(from.statusCode);
     // TODO: Figure out how to make the proxy respect statusMessage
     // console.log('from statusMessage:', from.statusMessage);
-}
+};
 
-function onResponse(err, inResponse, inRequest, reply, settings) {
-
+// This style rule is disabled because we don't control Hapi's API.
+// eslint-disable-next-line max-params
+const onResponse = (err, inResponse, inRequest, reply, settings) => {
     if (err) {
         // Modify errors to be more clear and user friendly.
         if (err.code === 'ENOTFOUND') {
@@ -70,7 +71,6 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
 
     // Fix HTTP redirects, which would kick the user out of the proxy.
     if (redirectCodes.includes(inResponse.statusCode)) {
-
         const target = settings.uri;
 
         // Re-write redirect URLs to use the proxy. These can be relative,
@@ -113,51 +113,44 @@ function onResponse(err, inResponse, inRequest, reply, settings) {
         timeout : 30000
     };
     wreck.read(unencoded, bufferingOptions, (err, buffer) => {
-
         if (err) {
             throw err;
         }
 
-        const
-            xmlMode = contentType.includes('xml'),
-            page = pageEditor.editPage(buffer, { xmlMode }),
-            outResponse = reply(page);
+        const xmlMode = contentType.includes('xml');
+        const page = pageEditor.editPage(buffer, { xmlMode });
+        const outResponse = reply(page);
 
         // Pass along response metadata from the upstream server,
         // such as the Content-Type.
         mapResponseData(inResponse, outResponse);
     });
-}
+};
 
-function onRequest(inRequest, reply) {
-
+const onRequest = (inRequest, reply) => {
     // The user's desired URL to visit.
     const target = getTargetUrl(inRequest.url.href);
 
     // Deal with lazy users, favicon.ico requests, etc. where a protocol
     // and maybe even an origin, cannot be determined from the target.
     if (isRelativeUrl(target)) {
+        const referrer = inRequest.info.referrer;
+        const resolvedTarget = referrer ?
+            url.resolve(
+                assumeHttp(getTargetUrl(
+                    url.parse(referrer).path
+                )),
+                '/' + target
+            ) :
+            // Resolving adds a trailing slash to domain root URLs,
+            // which helps the client resolve page-relative URLs.
+            url.resolve('', assumeHttp(target));
 
-        const
-            referrer = inRequest.info.referrer,
-            resolvedTarget = referrer ?
-                    url.resolve(
-                        assumeHttp(getTargetUrl(
-                            url.parse(referrer).path
-                        )),
-                        '/' + target
-                    )
-                :
-                    // Resolving adds a trailing slash to domain root URLs,
-                    // which helps the client resolve page-relative URLs.
-                    url.resolve('', assumeHttp(target));
-
-        if (!(url.parse(resolvedTarget).hostname)) {
+        if (!url.parse(resolvedTarget).hostname) {
             reply(boom.badRequest(
                 resolvedTarget === 'http:///' ?
-                        'A target is required, but was not provided'
-                    :
-                        'An invalid target was provided (no hostname)'
+                    'A target is required, but was not provided' :
+                    'An invalid target was provided (no hostname)'
             ));
             return;
         }
@@ -197,16 +190,16 @@ function onRequest(inRequest, reply) {
     }
 
     reply.proxy({
-        uri : target,
+        uri         : target,
         // Shovel headers between the client and target.
         passThrough : true,
         onResponse
     });
-}
+};
 
 module.exports = {
     method : '*',
-    path   : ROUTE_PREFIX + '{target*}',
+    path   : routePrefix + '{target*}',
     config : {
         // Pretty print JSON responses (namely, errors) for a friendly UX.
         json : {
@@ -216,7 +209,7 @@ module.exports = {
         // https://github.com/hapijs/hapi/issues/2647
         payload : {
             output : 'stream',
-            parse : false
+            parse  : false
         }
     },
     handler : onRequest

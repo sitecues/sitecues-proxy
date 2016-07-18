@@ -5,7 +5,7 @@
 
 const cheerio = require('cheerio');
 
-function editPage(page, option) {
+const editPage = (page, option) => {
     const { xmlMode } = option;
     const $ = cheerio.load(page, { xmlMode });
 
@@ -23,7 +23,7 @@ function editPage(page, option) {
     $('h1').text('no way');
 
     return xmlMode ? $.xml() : $.html();
-}
+};
 
 module.exports = {
     editPage

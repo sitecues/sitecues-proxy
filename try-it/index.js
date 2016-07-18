@@ -3,16 +3,27 @@
 const fs = require('fs');
 const path = require('path');
 const { Server } = require('hapi');
+const h2o2 = require('h2o2');
+/* eslint-disable global-require */
+const routes = [
+    require('./route/status'),
+    require('./route/target'),
+    require('./route/stream-target')
+];
+/* eslint-enable global-require */
 
 class ReverseProxy extends Server {
 
     constructor(option) {
-        option = Object.assign(
+        const config = Object.assign(
             {
                 port : 8001,
-                tls : {
+                tls  : {
+                    // Async configuration for constructors is a pain.
+                    /* eslint-disable no-sync */
                     key  : fs.readFileSync(path.join(__dirname, 'ssl/key/localhost.key')),
                     cert : fs.readFileSync(path.join(__dirname, 'ssl/cert/localhost.cert'))
+                    /* eslint-enable no-sync */
                 }
             },
             option
@@ -20,18 +31,14 @@ class ReverseProxy extends Server {
 
         super();
         super.connection({
-            port : option.port,
-            tls  : option.tls
+            port : config.port,
+            tls  : config.tls
         });
     }
 
     start() {
-        return super.register(require('h2o2')).then(() => {
-            super.route([
-                require('./route/status'),
-                require('./route/target'),
-                require('./route/stream-target')
-            ]);
+        return super.register(h2o2).then(() => {
+            super.route(routes);
 
             // Sadly, we cannot just return the start() promise because of:
             // https://github.com/hapijs/hapi/issues/3217

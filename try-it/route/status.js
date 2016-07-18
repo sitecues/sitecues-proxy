@@ -1,19 +1,18 @@
 'use strict';
 
-const
-    alignJson = require('json-align'),
-    pkg       = require('read-pkg-up').sync({cwd:__dirname}).pkg,
-    APP_NAME  = pkg.name,
-    VERSION   = pkg.version;
+const alignJson = require('json-align');
+const { pkg } = require('read-pkg-up').sync({ cwd : __dirname });
+
+const appName = pkg.name;
+const appVersion = pkg.version;
 
 module.exports = {
     method : 'GET',
-    path   : `/__${APP_NAME}/status`,
+    path   : `/__${appName}/status`,
     handler(request, reply) {
-
         const status = {
-            app        : APP_NAME,
-            version    : VERSION,
+            app        : appName,
+            version    : appVersion,
             statusCode : 200,
             status     : 'OK',
             time       : (new Date()).toISOString(),
