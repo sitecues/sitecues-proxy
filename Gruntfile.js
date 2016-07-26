@@ -2,162 +2,158 @@
 
 'use strict';
 
-const
-    configFiles = [
-        'Gruntfile.js',
-        'config/**/*.js'
-    ],
-    testFiles = [
-        'test/**/*.js'
-    ],
-    appFiles = [
-        // The "main" file as defined in package.json.
-        '<%= pkg.main %>',
-        // CLI modules.
-        'bin/**/*.js',
-        // Primary source code modules.
-        'lib/**/*.js'
-    ],
-    jsLintDirectives = {
-        // Be quiet about whitespace, JSCS is smarter.
-        white  : true,
-        // Max line length in characters.
-        maxlen : 80,
-        node   : true
-    };
+const configFiles = [
+    'Gruntfile.js',
+    'config/**/*.js'
+];
+const testFiles = [
+    'test/**/*.js'
+];
+const appFiles = [
+    // The "main" file as defined in package.json.
+    '<%= pkg.main %>',
+    // CLI modules.
+    'bin/**/*.js',
+    // Primary source code modules.
+    'lib/**/*.js'
+];
+const jsLintDirectives = {
+    // Be quiet about whitespace, JSCS is smarter.
+    white  : true,
+    // Max line length in characters.
+    maxlen : 80,
+    node   : true
+};
 
-function taskRunner(grunt) {
-
+const setupTaskRunner = (grunt) => {
     // Task configuration.
-    grunt.initConfig(
-        {
-            // Getting the Node app configuration as an object,
-            // which can be used internally.
-            pkg : grunt.file.readJSON('package.json'),
+    grunt.initConfig({
+        // Getting the Node app configuration as an object,
+        // which can be used internally.
+        pkg : grunt.file.readJSON('package.json'),
 
-            // Clean configuration, used to wipe out temporary build data,
-            // for more robust and reliable builds.
-            clean : {
-                // Enable this to do a dry run (logs but no actual changes)
-                // options : {
-                //     'no-write': true
-                // },
-                normal : {
-                    src : [
-                        // Test results.
-                        'report',
-                        // App logs.
-                        'log'
-                    ]
-                }
-            },
-
-            // JSONLint configuration, used for linting config files.
-            jsonlint : {
-                normal : {
-                    src : [
-                        'package.json',
-                        'config/**/*.json',
-                        'test/**/*.json',
-                        'lib/**/*.json'
-                    ]
-                }
-            },
-
-            // JSHint configuration, used for linting the library...
-            jshint : {
-                // Task local options, these override JSHint defaults and are
-                // inherited by all targets in this task.
-                options : {
-                    // Look for config near each linted file
-                    jshintrc : true
-                },
-                config : {
-                    // This target knows how to lint the build system.
-                    files : {
-                        src : configFiles
-                    }
-                },
-                tests : {
-                    // This target knows how to lint the app's tests.
-                    files : {
-                        src : testFiles
-                    }
-                },
-                app : {
-                    // This target knows how to lint the primary app.
-                    files : {
-                        src : appFiles
-                    }
-                }
-            },
-
-            // JSCS configuration, used for enforcing coding style requirements.
-            jscs : {
-                options : {
-                    // Look for config near each linted file.
-                    config : true
-                },
-                config : {
-                    files : {
-                        src : configFiles
-                    }
-                },
-                tests : {
-                    files : {
-                        src : testFiles
-                    }
-                },
-                app : {
-                    files : {
-                        src : appFiles
-                    }
-                }
-            },
-
-            // JSLint configuration, used for advice on code style.
-            jslint : {
-                config : {
-                    files : {
-                        src : configFiles
-                    },
-                    directives : jsLintDirectives
-                },
-                tests : {
-                    files : {
-                        src : testFiles
-                    },
-                    directives : jsLintDirectives
-                },
-                app : {
-                    files : {
-                        src : appFiles
-                    },
-                    directives : jsLintDirectives
-                }
-            },
-
-            // Intern configuration, used for the app's automated tests.
-            intern : {
-                options : {
-                    // Test framework config file path.
-                    config  : 'config/intern',
-                    // Whether to run in Node or the browser. Proxy runs in Node.
-                    runType : 'client'
-                },
-                normal : {
-                    // Empty target because it inherits task local options.
-                }
-            },
-
-            // Watch configuration, used for automatically executing
-            // tasks when saving files in the library.
-            watch : {
-                files : ['**.*'],
-                tasks : ['lint']
+        // Clean configuration, used to wipe out temporary build data,
+        // for more robust and reliable builds.
+        clean : {
+            // Enable this to do a dry run (logs but no actual changes)
+            // options : {
+            //     'no-write': true
+            // },
+            normal : {
+                src : [
+                    // Test results.
+                    'report',
+                    // App logs.
+                    'log'
+                ]
             }
+        },
+
+        // JSONLint configuration, used for linting config files.
+        jsonlint : {
+            normal : {
+                src : [
+                    'package.json',
+                    'config/**/*.json',
+                    'test/**/*.json',
+                    'lib/**/*.json'
+                ]
+            }
+        },
+
+        // JSHint configuration, used for linting the library...
+        jshint : {
+            // Task local options, these override JSHint defaults and are
+            // inherited by all targets in this task.
+            options : {
+                // Look for config near each linted file
+                jshintrc : true
+            },
+            config : {
+                // This target knows how to lint the build system.
+                files : {
+                    src : configFiles
+                }
+            },
+            tests : {
+                // This target knows how to lint the app's tests.
+                files : {
+                    src : testFiles
+                }
+            },
+            app : {
+                // This target knows how to lint the primary app.
+                files : {
+                    src : appFiles
+                }
+            }
+        },
+
+        // JSCS configuration, used for enforcing coding style requirements.
+        jscs : {
+            options : {
+                // Look for config near each linted file.
+                config : true
+            },
+            config : {
+                files : {
+                    src : configFiles
+                }
+            },
+            tests : {
+                files : {
+                    src : testFiles
+                }
+            },
+            app : {
+                files : {
+                    src : appFiles
+                }
+            }
+        },
+
+        // JSLint configuration, used for advice on code style.
+        jslint : {
+            config : {
+                files : {
+                    src : configFiles
+                },
+                directives : jsLintDirectives
+            },
+            tests : {
+                files : {
+                    src : testFiles
+                },
+                directives : jsLintDirectives
+            },
+            app : {
+                files : {
+                    src : appFiles
+                },
+                directives : jsLintDirectives
+            }
+        },
+
+        // Intern configuration, used for the app's automated tests.
+        intern : {
+            options : {
+                // Test framework config file path.
+                config  : 'config/intern',
+                // Whether to run in Node or the browser. Proxy runs in Node.
+                runType : 'client'
+            },
+            normal : {
+                // Empty target because it inherits task local options.
+            }
+        },
+
+        // Watch configuration, used for automatically executing
+        // tasks when saving files in the library.
+        watch : {
+            files : ['**.*'],
+            tasks : ['lint']
         }
-    );
+    });
     // Load the plugin that provides the "clean" task.
     grunt.loadNpmTasks('grunt-contrib-clean');
     // Load the plugin that provides the "jsonlint" task.
@@ -182,6 +178,6 @@ function taskRunner(grunt) {
 
     // Default task, will run if no task is specified.
     grunt.registerTask('default', ['clean', 'lint', 'test']);
-}
+};
 
-module.exports = taskRunner;
+module.exports = setupTaskRunner;

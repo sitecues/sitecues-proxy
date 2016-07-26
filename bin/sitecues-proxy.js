@@ -4,12 +4,11 @@
 
 'use strict';
 
-const
-    server = require('../').createServer(),
-    chalk = require('chalk'),
-    rootCheck = require('root-check'),
-    SecurityError = require('../lib/error').SecurityError,
-    log = require('../lib/log');
+const chalk = require('chalk');
+const rootCheck = require('root-check');
+const server = require('../').createServer();
+const { SecurityError } = require('../lib/error');
+const log = require('../lib/log');
 
 // Crash and burn, die fast if a rejected promise is not caught.
 process.on('unhandledRejection', (err) => {
@@ -19,7 +18,6 @@ process.on('unhandledRejection', (err) => {
 let cancelled = false;
 
 process.on('SIGINT', () => {
-
     if (cancelled) {
         console.warn('\nShutting down immediately. You monster!');
         process.exit(1);
@@ -32,10 +30,11 @@ process.on('SIGINT', () => {
     server.stop();
 });
 
-server.init().then(() => {
+server.init()
+    .then(() => {
         return server.start();
     })
-    .then((server) => {
+    .then(() => {
         // Attempt to set UID to a normal user now that we definitely
         // do not need elevated privileges.
         rootCheck(
