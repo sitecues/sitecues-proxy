@@ -7,7 +7,6 @@ define(
         'intern/dojo/node!../../../../lib/util/sitecues-url'
     ],
     function (tdd, assert, sitecuesUrl) {
-
         'use strict';
 
         const { suite, test } = tdd;
@@ -16,30 +15,30 @@ define(
             test('environments', function () {
                 // The environment must be respected when formatting the host.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { environment : 'local' }
-                    ),
+                    sitecuesUrl({
+                        environment : 'local'
+                    }),
                     '//localhost/l/s;id=s-00000005/js/sitecues.js'
                 );
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { environment : 'dev' }
-                    ),
+                    sitecuesUrl({
+                        environment : 'dev'
+                    }),
                     '//js.dev.sitecues.com/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { environment : 'prod' }
-                    ),
+                    sitecuesUrl({
+                        environment : 'prod'
+                    }),
                     '//js.sitecues.com/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 // The environment must be respected when formatting the host,
                 // even if it is an alias.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { environment : 'localhost' }
-                    ),
+                    sitecuesUrl({
+                        environment : 'localhost'
+                    }),
                     '//localhost/l/s;id=s-00000005/js/sitecues.js'
                 );
             });
@@ -49,17 +48,19 @@ define(
             test('environment', function () {
                 // The port must be respected when formatting the host.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { environment : 'local', port : '8888' }
-                    ),
+                    sitecuesUrl({
+                        environment : 'local',
+                        port        : '8888'
+                    }),
                     '//localhost:8888/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 // The port must be respected, even as a number, when formatting the host.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { environment : 'local', port : 8888 }
-                    ),
+                    sitecuesUrl({
+                        environment : 'local',
+                        port        : 8888
+                    }),
                     '//localhost:8888/l/s;id=s-00000005/js/sitecues.js'
                 );
             });
@@ -68,42 +69,43 @@ define(
 
             test('hostnames', function () {
                 // NO MATCH, NO ENVIRONMENT EXPANSION
-
-                // Simple hostnames must be allowed.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { hostname : 'foo' }
-                    ),
-                    '//foo/l/s;id=s-00000005/js/sitecues.js'
+                    sitecuesUrl({
+                        hostname : 'foo'
+                    }),
+                    '//foo/l/s;id=s-00000005/js/sitecues.js',
+                    'Simple hostnames must be allowed.'
                 );
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { hostname : 'foo.com' }
-                    ),
+                    sitecuesUrl({
+                        hostname : 'foo.com'
+                    }),
                     '//foo.com/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 // ENVIRONMENT EXPANSION
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { hostname : 'dev' }
-                    ),
+                    sitecuesUrl({
+                        hostname : 'dev'
+                    }),
                     '//js.dev.sitecues.com/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
                 // Respect protocol.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { hostname : 'dev', protocol : 'https' }
-                    ),
+                    sitecuesUrl({
+                        hostname : 'dev',
+                        protocol : 'https'
+                    }),
                     'https://js.dev.sitecues.com/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
 
                 // Handle port numbers, not just strings.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { hostname : 'foo.com', port : 8888 }
-                    ),
+                    sitecuesUrl({
+                        hostname : 'foo.com',
+                        port     : 8888
+                    }),
                     '//foo.com:8888/l/s;id=s-00000005/js/sitecues.js'
                 );
             });
@@ -111,85 +113,85 @@ define(
             // -------------------- test boundary ------------
 
             test('hosts', function () {
-
                 // NO MATCH, NO ENVIRONMENT EXPANSION
-
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'foo' }
-                    ),
+                    sitecuesUrl({
+                        host : 'foo'
+                    }),
                     '//foo/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'foo.com' }
-                    ),
+                    sitecuesUrl({
+                        host : 'foo.com'
+                    }),
                     '//foo.com/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 // ENVIRONMENT EXPANSION
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'dev' }
-                    ),
+                    sitecuesUrl({
+                        host : 'dev'
+                    }),
                     '//js.dev.sitecues.com/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
 
                 // NO MATCH, NO ENVIRONMENT EXPANSION
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'foo:8888' }
-                    ),
+                    sitecuesUrl({
+                        host : 'foo:8888'
+                    }),
                     '//foo:8888/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'foo.com:8888' }
-                    ),
+                    sitecuesUrl({
+                        host : 'foo.com:8888'
+                    }),
                     '//foo.com:8888/l/s;id=s-00000005/js/sitecues.js'
                 );
 
                 // ENVIRONMENT EXPANSION
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'dev:8888' }
-                    ),
+                    sitecuesUrl({
+                        host : 'dev:8888'
+                    }),
                     '//js.dev.sitecues.com:8888/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
 
                 // Ignore port, host trumps it.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'dev', port : '8888' }
-                    ),
+                    sitecuesUrl({
+                        host : 'dev',
+                        port : '8888'
+                    }),
                     '//js.dev.sitecues.com/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
 
                 // Ignore port, host trumps it, plus it already has one.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'dev:8888', port : '4444' }
-                    ),
+                    sitecuesUrl({
+                        host : 'dev:8888',
+                        port : '4444'
+                    }),
                     '//js.dev.sitecues.com:8888/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
 
                 // Sanitize weird input.
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'dev:' }
-                    ),
+                    sitecuesUrl({
+                        host : 'dev:'
+                    }),
                     '//js.dev.sitecues.com/l/s;id=s-00000005/dev/latest/js/sitecues.js'
                 );
 
                 assert.strictEqual(
-                    sitecuesUrl(
-                        { host : 'foo:' }
-                    ),
+                    sitecuesUrl({
+                        host : 'foo:'
+                    }),
                     '//foo/l/s;id=s-00000005/js/sitecues.js'
                 );
             });
