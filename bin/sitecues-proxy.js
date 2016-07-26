@@ -4,16 +4,14 @@
 
 'use strict';
 
+// Crash and burn, die fast if a rejected promise is not caught.
+require('throw-rejects/register');
+
 const chalk = require('chalk');
 const rootCheck = require('root-check');
 const server = require('../').createServer();
 const { SecurityError } = require('../lib/error');
 const log = require('../lib/log');
-
-// Crash and burn, die fast if a rejected promise is not caught.
-process.on('unhandledRejection', (err) => {
-    throw err;
-});
 
 let cancelled = false;
 

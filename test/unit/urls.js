@@ -10,8 +10,7 @@ define(
 
         'use strict';
 
-        const
-            { suite, test } = tdd;
+        const { suite, test } = tdd;
 
         suite('basics', function () {
             test('environments', function () {
