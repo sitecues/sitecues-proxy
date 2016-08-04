@@ -8,17 +8,15 @@ define(
         '../test/all-functional'
     ],
     function (intern, allUnit, allFunctional) {
-
         'use strict';
 
-        const
-            proxyPort = 9000,
-            // This path is relative to baseUrl.
-            testDir = '../../test/',
-            // Name of the alias to the unit suite directory.
-            UNIT_PKG = 'unit',
-            // Name of the alias to the functional suite directory.
-            FUNC_PKG = 'functional';
+        const proxyPort = 9000;
+        // This path is relative to baseUrl.
+        const testDir = '../../test/';
+        // Name of the alias to the unit suite directory.
+        const unitPkg = 'unit';
+        // Name of the alias to the functional suite directory.
+        const funcPkg = 'functional';
 
         let build = 'UNKNOWN';
 
@@ -58,8 +56,14 @@ define(
             // Options to pass to the AMD module loader.
             loaderOptions : {
                 packages : [
-                    { name : UNIT_PKG, location : `${testDir}unit` },
-                    { name : FUNC_PKG, location : `${testDir}functional` }
+                    {
+                        name     : unitPkg,
+                        location : `${testDir}unit`
+                    },
+                    {
+                        name     : funcPkg,
+                        location : `${testDir}functional`
+                    }
                 ]
             },
 
@@ -75,12 +79,12 @@ define(
 
             // Which unit test suite files to load. These test our APIs.
             suites : allUnit.map((suite) => {
-                return `${UNIT_PKG}/${suite}`;
+                return `${unitPkg}/${suite}`;
             }),
             // Which functional test suite files to load. These test our
             // user-facing behavior.
             functionalSuites : allFunctional.map((suite) => {
-                return `${FUNC_PKG}/${suite}`;
+                return `${funcPkg}/${suite}`;
             }),
 
             // Test whitelist, matched against "suite name - test name".
