@@ -1,107 +1,118 @@
-# sitecues Proxy
+# sitecues-proxy [![Build status for sitecues-proxy on Circle CI.](https://img.shields.io/circleci/project/sitecues/sitecues-proxy/master.svg "Circle Build Status")](https://circleci.com/gh/sitecues/sitecues-proxy "Sitecues Proxy Builds")
 
-A web server that sits between you and a website, to add or remove sitecues.
+> Intercept webpages to add or remove Sitecues.
 
- - General testing
- - Code debugging
- - Quality assurance
+## Why?
 
-**Version**: `0.1.0`    
-**Documentation**: [The sitecues&reg; Proxy](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=36241450 "Documentation for the sitecues Proxy.")    
-**Author**: [Seth Holladay](http://seth-holladay.com "Personal website for Seth Holladay.")
+ - Enables testing on potential and existing customer sites.
+ - Reliable simulation, happening at the network layer.
+ - Powerful and easy to use.
 
-## Installation
+## Install
 
-Download the project.
-````sh
-git clone git@bitbucket.org:ai_squared/sitecues-proxy.git
-````
+As a dependency:
 
-Move into its shiny new home.
-````sh
-cd sitecues-proxy
-````
+```sh
+npm install sitecues/sitecues-proxy --save
+```
 
-For convenience, so you may use the proxy from any directory, you probably want to put it in your [`$PATH`](http://www.linfo.org/path_env_var.html "Description of the PATH environment variable.").
-````sh
-npm link
-````
+As a project to work on:
 
-Now you can run `sitecues-proxy` from anywhere on the command line. It is equivalent to `npm start` seen below, but that command only works inside of the project directory, because it is intentionally relative to the nearest [package.json](https://docs.nodejitsu.com/articles/getting-started/npm/what-is-the-file-package-json "Description of the package.json file.") in or above the current working directory.
+```sh
+git clone git@github.com:sitecues/sitecues-proxy.git && cd sitecues-proxy && npm link
+```
 
 ## Usage
-At the moment, all settings on the command line are given via environment variables. Don't confuse these with arguments, they have different syntax and (by convention) must be uppercase with underscores, like `A_CONSTANT`.
 
-If using the proxy programmatically by `require()`ing it, then you may pass an options object with camelCase properties, which will take precedence.
+Get it into your program.
 
-Eventually, we will bake in a module to normalize all of this so you don't really have to care.
+```js
+const sitecuesProxy = require('sitecues-proxy');
+```
 
-Run the proxy on a desired port.
-````sh
-PORT=8888 npm start
-````
+Start the server.
 
-Specify a hostname to associate the proxy with.
-````sh
-HOSTNAME=localhost npm start
-````
+```js
+sitecuesProxy.start();
+```
+
+
+### Command Line Interface.
+
+Tell the proxy which port to listen on.
+
+```sh
+PORT=8888 sitecues-proxy
+```
+
+Tell the proxy which hostname to listen on.
+
+```sh
+HOSTNAME=localhost sitecues-proxy
+```
 
 Specify a complete `host` to associate the proxy with. Takes precedence over the less specific `hostname` or `port`.
-````sh
-HOST=localhost:8000 npm start
-````
+
+```sh
+HOST=localhost:8000 sitecues-proxy
+```
 
 Control how quiet or noisy the proxy logs should be.
-````sh
-LOG_LEVEL=debug npm start
-````
+
+```sh
+LOG_LEVEL=debug sitecues-proxy
+```
 
 Demand that the proxy log level be *at least* `verbose` (may be more noisy).
-````sh
-VERBOSE=true npm start
-````
 
-### sitecues Loader Options
+```sh
+VERBOSE=true sitecues-proxy
+```
+
+### Sitecues Loader Options
 
 **The following options control the sitecues load script added to pages. They do not control the proxy itself.**
 
 Inject a specific branch.
-````sh
-BRANCH=x-newpanel npm start
-````
+
+```sh
+BRANCH=x-newpanel sitecues-proxy
+```
 
 Inject a specific release candidate, deployed by CI.
-````sh
-RELEASE=3.1.2 npm start
-````
+
+```sh
+RELEASE=3.1.2 sitecues-proxy
+```
 
 Inject a specific development version, deployed by CI.
-````sh
-DEV_VERSION=32.673 npm start
-````
+
+```sh
+DEV_VERSION=32.673 sitecues-proxy
+```
 
 Load sitecues from the production servers.
-````sh
-PRODUCTION=true npm start
-````
+
+```sh
+PRODUCTION=true sitecues-proxy
+```
 
 Set the string used to identify customer sites.
-````sh
-SITE_ID=0000ee0c npm start
-````
 
-## Contribution
-* Generally try to follow [Crockford conventions](http://javascript.crockford.com/code.html "Douglas Crockford's recommendations for JavaScript code style.").
-* Never commit directly to **master**.
-* Code must be reviewed by a previous contributor before pushing to or merging into **master**.
-* Must pass npm test before pushing to or merging into **master**.
+```sh
+SITE_ID=0000ee0c sitecues-proxy
+```
 
-1. Create your feature branch: `git checkout -b my-new-feature`
+## Contributing
+
+See our [contributing guidelines](https://github.com/sitecues/sitecues-proxy/blob/master/CONTRIBUTING.md "The guidelines for participating in this project.") for more details.
+
+1. [Fork it](https://github.com/sitecues/sitecues-proxy/fork).
+2. Make a feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
-5. [Submit a pull request](https://bitbucket.org/ai_squared/sitecues-proxy/pull-request/new "Submit your code to be merged in, pending a review.").
+5. [Submit a pull request](https://github.com/sitecues/sitecues-proxy/compare "Submit code to this project for review.").
 
 ## License
-[MPL-2.0](https://www.mozilla.org/MPL/2.0/ "The license for the sitecues Proxy.")
 
-Go make something, dang it.
+Copyright © [Sitecues](https://sitecues.com "Owner of sitecues-proxy."). All rights reserved.
