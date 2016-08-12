@@ -6,7 +6,7 @@ define(
         'intern/chai!assert',
         'intern/dojo/node!../../../../lib/util/sitecues-url'
     ],
-    function (tdd, assert, sitecuesUrl) {
+    (tdd, assert, sitecuesUrl) => {
         'use strict';
 
         const { suite, test } = tdd;
