@@ -1,11 +1,11 @@
 'use strict';
 
 const url = require('url');
-const zlib = require('zlib');
 const isRelativeUrl = require('url-type').isRelative;
 const boom = require('boom');
 const wreck = require('wreck');
 const pageEditor = require('../page-editor');
+const unzip = require('../unzip');
 
 const routePrefix = '/';
 // NOTE: Not all 3xx responses should be messed with.
@@ -86,33 +86,17 @@ const onResponse = (err, inResponse, inRequest, reply, settings) => {
 
     const contentType = (inResponse.headers['content-type'] || '').toLowerCase();
 
-    // Ensure we don't modify non-HTML responses.
+    // Transparently pass through responses that aren't HTML or XHTML.
     if (!contentType || !contentType.includes('html')) {
         reply(inResponse);
         return;
     }
 
-    const encoding = inResponse.headers['content-encoding'];
-
-    let decoder;
-
-    if (encoding === 'gzip') {
-        decoder = zlib.createGunzip();
-    }
-    else if (encoding === 'deflate') {
-        decoder = zlib.createInflate();
-    }
-    else if (encoding) {
-        throw new Error('Unknown encoding:', encoding);
-    }
-
-    const unencoded = decoder ? inResponse.pipe(decoder) : inResponse;
-
     // Buffer the response into memory so that we can parse it into a DOM.
     const bufferingOptions = {
         timeout : 30000
     };
-    wreck.read(unencoded, bufferingOptions, (err, buffer) => {
+    wreck.read(unzip(inResponse), bufferingOptions, (err, buffer) => {
         if (err) {
             throw err;
         }

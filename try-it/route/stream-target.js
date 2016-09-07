@@ -1,10 +1,10 @@
 'use strict';
 
 const url = require('url');
-const zlib = require('zlib');
 const isRelativeUrl = require('url-type').isRelative;
 const boom = require('boom');
 const Trumpet = require('trumpet');
+const unzip = require('../unzip');
 
 const routePrefix = '/stream/';
 // NOTE: Not all 3xx responses should be messed with.
@@ -91,20 +91,6 @@ const onResponse = (err, inResponse, inRequest, reply, settings) => {
         return;
     }
 
-    const encoding = inResponse.headers['content-encoding'];
-
-    let decoder;
-
-    if (encoding === 'gzip') {
-        decoder = zlib.createGunzip();
-    }
-    else if (encoding === 'deflate') {
-        decoder = zlib.createInflate();
-    }
-    else if (encoding) {
-        throw new Error('Unknown encoding:', encoding);
-    }
-
     const editor = new Trumpet();
 
     editor.on('error', (err) => {
@@ -113,8 +99,7 @@ const onResponse = (err, inResponse, inRequest, reply, settings) => {
 
     editor.createWriteStream('h1').end('no one');
 
-    const unencoded = decoder ? inResponse.pipe(decoder) : inResponse;
-    const page = unencoded.pipe(editor);
+    const page = unzip(inResponse).pipe(editor);
     const outResponse = reply(page);
 
     // Pass along response metadata from the upstream server,
