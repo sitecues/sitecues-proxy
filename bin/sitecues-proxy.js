@@ -8,23 +8,13 @@
 require('throw-rejects/register');
 
 const chalk = require('chalk');
+const handleQuit = require('handle-quit');
 const rootCheck = require('root-check');
 const server = require('../').createServer();
 const { SecurityError } = require('../lib/error');
 const log = require('../lib/log');
 
-let cancelled = false;
-
-process.on('SIGINT', () => {
-    if (cancelled) {
-        console.warn('\nShutting down immediately. You monster!');
-        process.exit(1);
-    }
-
-    cancelled = true;
-
-    console.warn('\nShutting down. Please wait or hit CTRL+C to force quit.');
-
+handleQuit(() => {
     server.stop();
 });
 
