@@ -3,13 +3,12 @@
     var sitecues = window.sitecues = window.sitecues || {};
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    // New (with minicore) -- TODO? replace /dev/ with /`export SITECUES_JS_BRANCH=`git rev-parse --abbrev-ref HEAD`/
+    // New (with minicore) -- Future: replace /dev/ with /`export SITECUES_JS_BRANCH=`git rev-parse --abbrev-ref HEAD`/
+    sitecues.config.scriptUrl = 'https://{{{JS_HOSTNAME}}}/sitecues-core/s;id=' + sitecues.config.siteId + '/master/latest/js/sitecues.js';
     sitecues.config.appUrl = {
         branch : 'default'
         // version : 'bar'
     };
-    sitecues.config.scriptUrl = 'https://{{{JS_HOSTNAME}}}/sitecues-core/s;id=' + sitecues.config.siteId + '/' 
-      + (sitecues.config.appUrl.branch || 'master') + '/' + (sitecues.config.appUrl.version || 'latest') + '/js/sitecues.js';
     // Old (without minicore)
     // sitecues.config.scriptUrl = '//{{{JS_HOSTNAME}}}/js/sitecues.js';
     sitecues.config.isTester = true;  // Metrics from this user can be filtered out by backend
