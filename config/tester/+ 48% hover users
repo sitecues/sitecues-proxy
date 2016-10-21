@@ -1,0 +1,17 @@
+Users
++48% hover users
+-24 % page-visited::zoom-on per page-visited
+-12 % page-visited::speech-on per page-visited
+-34% panel clicks per badge-hover
+-2.6% panel-clicked per page-visited
+
+Sessions
++50% hovers per page-visited
++2.4 % page-visited::zoom-on per page-visited
++18 % page-visited::speech-on per page-visited
+-10% panel clicks per badge-hover
++35% panel-clicked per page-visited
+
+
+Normally, .92% of users become zoom users
+Now, 1.11% of users become zoom users

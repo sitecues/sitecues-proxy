@@ -6,8 +6,8 @@
     // New (with minicore) -- Future: replace /dev/ with /`export SITECUES_JS_BRANCH=`git rev-parse --abbrev-ref HEAD`/
     sitecues.config.scriptUrl = 'https://{{{JS_HOSTNAME}}}/sitecues-core/s;id=' + sitecues.config.siteId + '/master/latest/js/sitecues.js';
     sitecues.config.appUrl = {
-        branch : 'default'
-        // version : 'bar'
+        branch : '~latest-branch~'
+        // version : 'bar' // Defaults to latest
     };
     // Old (without minicore)
     // sitecues.config.scriptUrl = '//{{{JS_HOSTNAME}}}/js/sitecues.js';
