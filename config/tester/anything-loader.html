@@ -3,20 +3,40 @@
     // Development script injected via sitecues-proxy
     var sitecues = window.sitecues = window.sitecues || {},
         // We need the major and minor version as a string, e.g. '4.0' from full version number '4.0.13'
-        rawVersion = '{{{RAWVERSION}}}',
+        rawVersion = '{{{VERSION}}}' || 'default',
         releaseSplit = rawVersion.split('.'),
         majorVer = releaseSplit[0],
         minorVer = releaseSplit[1],
-        majMinVer = majorVer + '.' + minorVer;  
+        majMinVer = majorVer + '.' + minorVer,
+        jsHostName = '{{{JS_HOSTNAME}}}';
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    sitecues.config.scriptUrl = 'https://js.dev.sitecues.com/l/s;id=' + sitecues.config.siteId + '/release-' + majMinVer + '/' + rawVersion + '-RELEASE/js/sitecues.js';
+    if (rawVersion.substring(0,2) === '4.') {
+        // Old url format, used to test release 4.x
+        sitecues.config.scriptUrl = 'https://' + 
+            (jsHostName || 'js.dev.sitecues.com') + 
+            '/l/s;id=' + sitecues.config.siteId + 
+            '/release-' + majMinVer + '/' + rawVersion + '-RELEASE' +
+            '/js/sitecues.js';
+    }
+    else {
+        // New url format, uses minicore
+        var branchName = '{{{BRANCH}}}' || '~default';
+        sitecues.config.scriptUrl = 'http://' + (jsHostName || 'js.sitecues.com') +
+            '/sitecues-core/s;id=' + 
+            sitecues.config.siteId + 
+            '/master/latest/js/sitecues.js';
+        sitecues.config.appUrl = {
+            branch : branchName,
+            version : rawVersion
+        };
+        console.log(sitecues.config.appUrl);
+    }
     sitecues.config.isTester = true;  // Metrics from this user can be filtered out by backend
     // Do not allow the sitecues object to be wiped out or changed to something else,
     // but allow properties to be added to it, e.g. sitecues.$ = jQuery
     Object.defineProperty(window, 'sitecues', { writable: false });
     Object.defineProperty(sitecues, 'config', { writable: false }); // Do not allow reassignment, e.g. sitecues.config = {};
-    Object.freeze(sitecues.config); // Do not allow properties of sitecues.config to be changed, e.g. sitecues.config.siteId = 's-xxxx';
     (function () {
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];
