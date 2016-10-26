@@ -5,7 +5,7 @@
 'use strict';
 
 // Crash and burn, die fast if a rejected promise is not caught.
-require('throw-rejects/register');
+require('throw-rejects')();
 
 const chalk = require('chalk');
 const handleQuit = require('handle-quit');
