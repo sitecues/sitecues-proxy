@@ -2,7 +2,7 @@
 
 'use strict';
 
-const FriendlyServer = require('./lib/FriendlyServer');
+const FriendlyServer = require('./lib/friendly-server');
 
 // The sitecues proxy is actually a FriendlyServer factory.
 const sitecuesProxy = (...args) => {

@@ -10,11 +10,11 @@
     "email": "me@seth-holladay.com"
   },
   "scripts": {
-    "start": "node ./bin/sitecues-proxy.js",
+    "start": "node bin/proxy.js",
     "test": "xo"
   },
   "bin": {
-    "sitecues-proxy": "bin/sitecues-proxy.js"
+    "proxy": "bin/proxy.js"
   },
   "repository": {
     "type": "git",
@@ -29,13 +29,15 @@
   },
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
-  "directories": {
-    "lib": "./lib"
-  },
   "files": [
     "lib",
+    "bin",
     "index.js"
   ],
+  "directories": {
+    "lib": "./lib",
+    "bin": "./bin"
+  },
   "dependencies": {
     "adverb-signals": "^1.0.0",
     "chalk": "^1.1.3",
