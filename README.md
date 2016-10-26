@@ -71,17 +71,17 @@ Inject a specific load script such as config/local-loader.html (uses config/load
 LOADER_FILE=filename npm start
 ````
 
-Inject a specific branch and/or version (default BRANCH is dev. default VERSION is latest).
+Inject a specific branch and/or version (default BRANCH is ~default which will consult release-map for site id. default VERSION is default).
 ````sh
-LOADER_FILE=config/dev-loader.html BRANCH=(some branch name) VERSION=(some version number) npm start
+LOADER_FILE=config/anything-loader.html BRANCH=(some branch name) VERSION=(some version number) npm start
 ````
 
-Inject a specific release candidate, deployed by CI (no default for VERSION).
+Inject a specific release candidate, deployed by CI
 ````sh
-LOADER_FILE=config/release-loader.html VERSION=3.1.2 npm start
+LOADER_FILE=config/release-loader.html BRANCH=master VERSION=5.1.2 npm start
 ````
 
-Specify a hostname to associate the proxy with (default JS_HOSTNAME is localhost).
+Specify a hostname to associate the proxy with (default JS_HOSTNAME is js.sitecues.com).
 ````sh
 LOADER_FILE=config/local-loader.html JS_HOSTNAME=localhost npm start
 ````
