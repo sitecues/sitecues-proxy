@@ -3,32 +3,37 @@
     // Development script injected via sitecues-proxy
     var sitecues = window.sitecues = window.sitecues || {},
         // We need the major and minor version as a string, e.g. '4.0' from full version number '4.0.13'
-        rawVersion = '{{{VERSION}}}' || 'default',
-        releaseSplit = rawVersion.split('.'),
+        userSpecifiedVersion = '{{{VERSION}}}',
+        releaseSplit = userSpecifiedVersion.split('.'),
         majorVer = releaseSplit[0],
         minorVer = releaseSplit[1],
         majMinVer = majorVer + '.' + minorVer,
         jsHostName = '{{{JS_HOSTNAME}}}';
     sitecues.config = sitecues.config || {};
     sitecues.config.siteId = '{{{SITE_ID}}}';
-    if (rawVersion.substring(0,2) === '4.') {
+    if (userSpecifiedVersion.substring(0,2) === '4.') {
         // Old url format, used to test release 4.x
         sitecues.config.scriptUrl = 'https://' + 
             (jsHostName || 'js.dev.sitecues.com') + 
             '/l/s;id=' + sitecues.config.siteId + 
-            '/release-' + majMinVer + '/' + rawVersion + '-RELEASE' +
+            '/release-' + majMinVer + '/' + userSpecifiedVersion + '-RELEASE' +
             '/js/sitecues.js';
     }
     else {
         // New url format, uses minicore
-        var branchName = '{{{BRANCH}}}' || '~default';
+        var 
+          userSpecifiedBranch = '{{{BRANCH}}}',
+          branchName = userSpecifiedBranch || '~default',
+          // Use default/~default if neither branch nor version specified
+          defaultVersion = userSpecifiedBranch ? 'latest' : 'default',
+          branchVersion = userSpecifiedVersion || defaultVersion;
         sitecues.config.scriptUrl = 'http://' + (jsHostName || 'js.sitecues.com') +
             '/sitecues-core/s;id=' + 
             sitecues.config.siteId + 
             '/master/latest/js/sitecues.js';
         sitecues.config.appUrl = {
             branch : branchName,
-            version : rawVersion
+            version : branchVersion
         };
         console.log(sitecues.config.appUrl);
     }
