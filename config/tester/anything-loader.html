@@ -22,6 +22,9 @@
     else {
         // New url format, uses minicore
         var 
+          // Branch of sitecues-core
+          coreBranch = '{{{CORE_BRANCH}}}' || 'master',
+          // Branch and version of sitecues-js
           userSpecifiedBranch = '{{{BRANCH}}}',
           branchName = userSpecifiedBranch || '~default',
           // Use default/~default if neither branch nor version specified
@@ -30,7 +33,7 @@
         sitecues.config.scriptUrl = 'http://' + (jsHostName || 'js.sitecues.com') +
             '/sitecues-core/s;id=' + 
             sitecues.config.siteId + 
-            '/master/latest/js/sitecues.js';
+            '/' + coreBranch + '/latest/js/sitecues.js';
         sitecues.config.appUrl = {
             branch : branchName,
             version : branchVersion
@@ -47,7 +50,7 @@
             first  = document.getElementsByTagName('script')[0];
         script.type  = 'application/javascript';
         script.src   = sitecues.config.scriptUrl;
-        script.setAttribute('crossorigin', 'anonymous')
+        script.setAttribute('crossorigin', 'anonymous');
         first.parentNode.insertBefore(script, first);
     })();
 </script>
