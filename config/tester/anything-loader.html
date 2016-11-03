@@ -26,10 +26,8 @@
           coreBranch = '{{{CORE_BRANCH}}}' || 'master',
           // Branch and version of sitecues-js
           userSpecifiedBranch = '{{{BRANCH}}}',
-          branchName = userSpecifiedBranch || '~default',
-          // Use default/~default if neither branch nor version specified
-          defaultVersion = userSpecifiedBranch ? 'latest' : 'default',
-          branchVersion = userSpecifiedVersion || defaultVersion;
+          branchName = userSpecifiedBranch || '~latest',
+          branchVersion = userSpecifiedVersion || 'latest';
         sitecues.config.scriptUrl = 'http://' + (jsHostName || 'js.sitecues.com') +
             '/sitecues-core/s;id=' + 
             sitecues.config.siteId + 
