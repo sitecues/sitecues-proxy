@@ -19,7 +19,9 @@ npm install sitecues/sitecues-proxy --save
 As a project to work on:
 
 ```sh
-git clone git@github.com:sitecues/sitecues-proxy.git && cd sitecues-proxy && npm link
+git clone git@github.com:sitecues/sitecues-proxy.git &&
+cd sitecues-proxy &&
+npm link
 ```
 
 ## Usage
@@ -35,7 +37,6 @@ Start the server.
 ```js
 sitecuesProxy.start();
 ```
-
 
 ### Command Line Interface.
 
