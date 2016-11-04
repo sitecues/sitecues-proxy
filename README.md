@@ -66,24 +66,24 @@ LOADER_STRATEGY=replace   # (default) Replace the old loader where is in the doc
 
 ````
 
-Inject a specific load script such as config/local-loader.html (uses config/loader.html by default, for the latest production version)
+Inject a specific load script (developers only):
 ````sh
 LOADER_FILE=filename npm start
 ````
 
-Inject a specific branch and/or version (default BRANCH is ~default which will consult release-map for site id. default VERSION is default).
+Inject a specific branch and/or version (default branch is master)
 ````sh
-LOADER_FILE=config/anything-loader.html BRANCH=(some branch name) VERSION=(some version number) npm start
+BRANCH=(some branch name) VERSION=(some version number) npm start
 ````
 
-Inject a specific release candidate, deployed by CI
+Inject a specific release, deployed by CI (Will consult release-map for site id. default VERSION is latest to determine version unless the version is specified).
 ````sh
-LOADER_FILE=config/release-loader.html BRANCH=master VERSION=5.1.2 npm start
+VERSION=5.1.2 npm start
 ````
 
 Specify a hostname to associate the proxy with (default JS_HOSTNAME is js.sitecues.com).
 ````sh
-LOADER_FILE=config/local-loader.html JS_HOSTNAME=localhost npm start
+JS_HOSTNAME=localhost npm start
 ````
 
 Set a specific string used to identify customer sites. 
