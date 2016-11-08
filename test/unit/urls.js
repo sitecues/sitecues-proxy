@@ -13,8 +13,8 @@ define(
         const
             { suite, test } = tdd;
 
-        suite('basics', function () {
-            test('environments', function () {
+        suite('basics', () => {
+            test('environments', () => {
                 // The environment must be respected when formatting the host.
                 assert.strictEqual(
                     sitecuesUrl(
@@ -47,7 +47,7 @@ define(
 
             // -------------------- test boundary ------------
 
-            test('environment', function () {
+            test('environment', () => {
                 // The port must be respected when formatting the host.
                 assert.strictEqual(
                     sitecuesUrl(
@@ -67,7 +67,7 @@ define(
 
             // -------------------- test boundary ------------
 
-            test('hostnames', function () {
+            test('hostnames', () => {
                 // NO MATCH, NO ENVIRONMENT EXPANSION
 
                 // Simple hostnames must be allowed.
@@ -111,8 +111,12 @@ define(
 
             // -------------------- test boundary ------------
 
+<<<<<<< HEAD
             test('hosts', function () {
 
+=======
+            test('hosts', () => {
+>>>>>>> d7d5c1a... Solve all lint errors.
                 // NO MATCH, NO ENVIRONMENT EXPANSION
 
                 assert.strictEqual(
