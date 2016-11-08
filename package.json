@@ -70,6 +70,15 @@
     "service"
   ],
   "xo": {
-    "extend": "tidy"
+    "extend": "tidy",
+    "overrides": [
+      {
+        "files": ["config/intern.js", "test/**"],
+        "env": "amd",
+        "rules": {
+          "import/no-amd" : "off"
+        }
+      }
+    ]
   }
 }
