@@ -32,6 +32,11 @@ const PageProxy = require('../');
 const { SecurityError } = require('../lib/error');
 const log = require('../lib/log');
 
+const { logLevel } = cli.flags;
+if (logLevel && typeof logLevel === 'string') {
+    log.transports.console.level = logLevel;
+}
+
 // This function is designed to modify a URL such that its protocol
 // is http: if one is not already present.
 const assumeHttp = (inputUrl) => {
