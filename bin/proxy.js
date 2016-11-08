@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-// The command line interface for the sitecues Proxy.
+// The CLI for the Proxy.
+
+// TODO: Investigate whether hoxy can support us using port-drop.
 
 'use strict';
 
@@ -8,36 +10,60 @@
 require('throw-rejects')();
 
 const chalk = require('chalk');
-const handleQuit = require('handle-quit');
+const open = require('opn');
 const rootCheck = require('root-check');
-const server = require('../').createServer();
+const handleQuit = require('handle-quit');
+const cli = require('meow')(`
+    Usage
+      $ proxy
+
+    Option
+      --port  Listen on a custom port for requests.
+      --open  Open a URL in your browser.
+
+    Example
+      $ proxy
+      The Sitecues\u00AE Proxy is on port 8000.
+      $ proxy --port=7000
+      The Sitecues\u00AE Proxy is on port 7000.
+`);
+
+const PageProxy = require('../');
 const { SecurityError } = require('../lib/error');
 const log = require('../lib/log');
+
+// This function is designed to modify a URL such that its protocol
+// is http: if one is not already present.
+const assumeHttp = (inputUrl) => {
+    return inputUrl.replace(/^(?!(?:\w+:)?\/\/)/, 'http://');
+};
+
+const serverOptions = Object.assign({}, cli.flags);
+delete serverOptions.target;
+delete serverOptions.open;
+
+const server = new PageProxy(serverOptions);
 
 handleQuit(() => {
     server.stop();
 });
 
-server.init()
-    .then(() => {
-        return server.start();
-    })
-    .then(() => {
-        // Attempt to set UID to a normal user now that we definitely
-        // do not need elevated privileges.
-        rootCheck(
-            chalk.red.bold('I died trying to save you from yourself.\n') +
-            (new SecurityError('Failed to let go of root privileges.')).stack
-        );
+server.start().then(() => {
+    // Attempt to set UID to a normal user now that we definitely
+    // do not need elevated privileges.
+    rootCheck(
+        chalk.red.bold('I died trying to save you from yourself.\n') +
+        (new SecurityError('Unable to let go of root privileges.')).stack
+    );
 
-        const state = server.state;
+    const { state } = server;
 
-        let message = 'The sitecues\u00AE';
+    log.info(`The Sitecues\u00AE Proxy is on port ${state.port}.`);
 
-        if (state.reverseMode) {
-            message += ' reverse';
-        }
-        message += ` proxy is on port ${state.port}.`;
+    const target = cli.flags.open;
 
-        log.info(message);
-    });
+    if (target) {
+        const visitUrl = assumeHttp(target === true ? 'tired.com' : target);
+        open(visitUrl);
+    }
+});
