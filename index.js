@@ -17,8 +17,8 @@ class PageProxy {
                 /* eslint-disable no-sync */
                 loaderFile    : path.join('config', 'loader.html'),
                 certAuthority : {
-                    key  : fs.readFileSync(path.join(__dirname, 'proxy-ca', 'key', 'proxy-ca.key')),
-                    cert : fs.readFileSync(path.join(__dirname, 'proxy-ca', 'cert', 'proxy-ca.cert'))
+                    key  : fs.readFileSync(path.join(__dirname, 'lib', 'ca', 'key', 'proxy-ca.key')),
+                    cert : fs.readFileSync(path.join(__dirname, 'lib', 'ca', 'cert', 'proxy-ca.cert'))
                 }
                 /* eslint-enable no-sync */
             },
