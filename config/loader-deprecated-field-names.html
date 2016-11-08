@@ -10,12 +10,12 @@
         majMinVer = majorVer + '.' + minorVer,
         jsHostName = '{{{JS_HOSTNAME}}}';
     sitecues.config = sitecues.config || {};
-    sitecues.config.siteId = '{{{SITE_ID}}}';
+    sitecues.config.site_id = '{{{SITE_ID}}}';
     if (userSpecifiedVersion.substring(0,2) === '4.') {
         // Old url format, used to test release 4.x
-        sitecues.config.scriptUrl = 'https://' + 
+        sitecues.config.script_url = 'https://' + 
             (jsHostName || 'js.dev.sitecues.com') + 
-            '/l/s;id=' + sitecues.config.siteId + 
+            '/l/s;id=' + sitecues.config.site_id + 
             '/release-' + majMinVer + '/' + userSpecifiedVersion + '-RELEASE' +
             '/js/sitecues.js';
     }
@@ -26,12 +26,11 @@
           coreBranch = '{{{CORE_BRANCH}}}' || 'master',
           // Branch and version of sitecues-js
           userSpecifiedBranch = '{{{BRANCH}}}',
-          defaultBranch = jsHostName ? '~latest' : 'dev',
-          branchName = userSpecifiedBranch || defaultBranch,
+          branchName = userSpecifiedBranch || '~latest',
           branchVersion = userSpecifiedVersion || 'latest';
-        sitecues.config.scriptUrl = 'http://' + (jsHostName || 'js.sitecues.com') +
+        sitecues.config.script_url = 'http://' + (jsHostName || 'js.sitecues.com') +
             '/sitecues-core/s;id=' + 
-            sitecues.config.siteId + 
+            sitecues.config.site_id + 
             '/' + coreBranch + '/latest/js/sitecues.js';
         sitecues.config.appUrl = {
             branch : branchName,
@@ -48,7 +47,7 @@
         var script = document.createElement('script'),
             first  = document.getElementsByTagName('script')[0];
         script.type  = 'application/javascript';
-        script.src   = sitecues.config.scriptUrl;
+        script.src   = sitecues.config.script_url;
         script.setAttribute('crossorigin', 'anonymous');
         first.parentNode.insertBefore(script, first);
     })();

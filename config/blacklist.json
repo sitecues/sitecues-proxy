@@ -2,8 +2,7 @@
     { "url" : "audioeye.", "flags" : "i" },
     { "url" : "/favicon.ico", "flags" : "i" },
     { "url" : "localhost/.*html/prefs.html", "regex": true, "flags" : "i" },
-    { "url" : "localhost/.*html/global-storage.html", "regex": true, "flags" : "i" },
     { "url" : "sitecues.com/.*/prefs.html", "regex": true, "flags" : "i" },
-    { "url" : "sitecues.com/.*/global-storage.html", "regex": true, "flags" : "i" },
+    { "url" : "/global-storage.html", "regex": true, "flags" : "i" },
     { "url" : "192.*/.*/prefs.html", "regex": true, "flags" : "i" }
 ]
