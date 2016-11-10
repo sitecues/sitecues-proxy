@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "node ./bin/sitecues-proxy.js",
-    "test": "grunt clean lint test"
+    "test": "grunt clean"
   },
   "directories": {
     "doc": "./doc",
