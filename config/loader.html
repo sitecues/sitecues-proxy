@@ -29,7 +29,7 @@
           defaultBranch = jsHostName ? '~latest' : 'dev',
           branchName = userSpecifiedBranch || defaultBranch,
           branchVersion = userSpecifiedVersion || 'latest';
-        sitecues.config.scriptUrl = 'http://' + (jsHostName || 'js.sitecues.com') +
+        sitecues.config.scriptUrl = 'https://' + (jsHostName || 'js.sitecues.com') +
             '/sitecues-core/s;id=' + 
             sitecues.config.siteId + 
             '/' + coreBranch + '/latest/js/sitecues.js';
