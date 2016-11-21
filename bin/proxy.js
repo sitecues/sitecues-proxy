@@ -51,6 +51,14 @@ const server = new PageProxy(serverOptions);
 
 handleQuit(() => {
     server.stop();
+    // TODO: Properly fix Hoxy's shenanigans. https://github.com/greim/hoxy/issues/88
+    const hack = setTimeout(
+        () => {
+            process.exit(0);
+        },
+        600
+    );
+    hack.unref();
 });
 
 server.start().then(() => {
