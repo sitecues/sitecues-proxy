@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const hoxy = require('hoxy');
-const isRoot = require('is-root');
+const portType = require('port-type');
 const log = require('./lib/log');
 const loader = require('./lib/loader');
 const intercept = require('./lib/intercept');
@@ -114,7 +114,7 @@ class PageProxy {
             const onError = (err) => {
                 if (err.code === 'EACCES') {
                     err.message = `Insufficient privileges to run on port ${this.config.port}.`;
-                    if (!isRoot()) {
+                    if (!portType.haveRights()) {
                         err.message += ' Using sudo may help.';
                     }
                 }
@@ -143,7 +143,7 @@ class PageProxy {
                     }
                 );
 
-                resolve();
+                resolve(this);
             });
         });
     }
