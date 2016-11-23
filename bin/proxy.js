@@ -18,14 +18,18 @@ const cli = require('meow')(`
       $ proxy
 
     Option
-      --port  Listen on a custom port for requests.
-      --open  Open a URL in your browser.
+      --port <number>            Listen on a custom port for requests.
+      --open <url>               Open a URL in your browser.
+      --loader <string>          Code to inject into HTML responses.
+      --loaderFile <path>        Filepath to find a loader.
+      --loaderStrategy <string>  What to do with loaders.
+      --logLevel <level>         Amount of program info to output.
 
     Example
       $ proxy
-      The Sitecues\u00AE Proxy is on port 8000.
-      $ proxy --port=7000
-      The Sitecues\u00AE Proxy is on port 7000.
+      The Sitecues® Proxy is on port 8000.
+      $ proxy --port=8888
+      The Sitecues® Proxy is on port 8888.
 `);
 
 const PageProxy = require('../');

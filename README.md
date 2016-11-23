@@ -26,83 +26,114 @@ npm link
 
 ## Usage
 
-Get it into your program.
+```
+$ proxy --help
 
-```js
-const sitecuesProxy = require('sitecues-proxy');
+  Usage
+    $ proxy
+
+  Option
+    --port <number>            Listen on a custom port for requests.
+    --open <url>               Open a URL in your browser.
+    --loader <string>          Code to inject into HTML responses.
+    --loaderFile <path>        Filepath to find a loader.
+    --loaderStrategy <string>  What to do with loaders.
+    --logLevel <level>         Amount of program info to output.
+
+  Example
+    $ proxy
+    The Sitecues® Proxy is on port 8000.
+    $ proxy --port=8888
+    The Sitecues® Proxy is on port 8888.
 ```
 
-Start the server.
+Control how quiet or noisy the proxy logs are. Uses [npm levels](https://github.com/winstonjs/winston/blob/master/lib/winston/config/npm-config.js), possible values are `error`, `warn`, `info`, `verbose`, `debug`, `silly`.
 
-```js
-sitecuesProxy.start();
+```
+$ proxy --logLevel=debug
 ```
 
-### Command Line Interface.
+### Loader Options
 
-Tell the proxy which port to listen on.
+**The following options control the Sitecues loader added to pages. They do not control the proxy itself.**
 
-```sh
-PORT=8888 sitecues-proxy
+Load a specific branch.
+
+```
+$ proxy --branch=master
 ```
 
-Tell the proxy which hostname to listen on.
+Load a specific version.
 
-```sh
-HOSTNAME=localhost sitecues-proxy
+```
+$ proxy --version=1.0.0
 ```
 
-Specify a complete `host` to associate the proxy with. Takes precedence over the less specific `hostname` or `port`.
+Imitate a specific customer.
 
-```sh
-HOST=localhost:8000 sitecues-proxy
+```
+$ proxy --siteId=s-0000ee0c
 ```
 
-Control how quiet or noisy the proxy logs should be.
+Load from a specific server.
 
-```sh
-LOG_LEVEL=debug sitecues-proxy
+```
+$ proxy --jsHost=localhost
 ```
 
-Demand that the proxy log level be *at least* `verbose` (may be more noisy).
+## API
 
-```sh
-VERBOSE=true sitecues-proxy
-```
+### Proxy(option)
 
-### Sitecues Loader Options
+#### option
 
-**The following options control the sitecues load script added to pages. They do not control the proxy itself.**
+Type: `object`
 
-Inject a specific branch.
+Settings for the new proxy instance.
 
-```sh
-BRANCH=x-newpanel sitecues-proxy
-```
+##### port
 
-Inject a specific release candidate, deployed by CI.
+Type: `number`<br>
+Default: `8000`
 
-```sh
-RELEASE=3.1.2 sitecues-proxy
-```
+The port number to listen on for requests.
 
-Inject a specific development version, deployed by CI.
+##### loader
 
-```sh
-DEV_VERSION=32.673 sitecues-proxy
-```
+Type: `string`
 
-Load sitecues from the production servers.
+A piece of code to inject into webpages. Takes precedence over `loaderFile`.
 
-```sh
-PRODUCTION=true sitecues-proxy
-```
+##### loaderFile
 
-Set the string used to identify customer sites.
+Type: `string`<br>
+Default: `config/loader.html`
 
-```sh
-SITE_ID=0000ee0c sitecues-proxy
-```
+A filepath to find a loader, when `loader` is not provided.
+
+##### loaderStrategy
+
+Type: `string`<br>
+Default: `replace`
+
+What to do with loaders that are provided and ones that are encountered on webpages.
+
+| Strategy  | Description                                                    |
+|-----------|----------------------------------------------------------------|
+| `add`     | Always inject the provided loader, no matter what.             |
+| `remove`  | Simply remove any loaders on the page and do nothing else.     |
+| `keep`    | Inject the provided loader only if the page does not have one. |
+| `replace` | Ensure the page loads with only the provided loader.           |
+
+### Instance
+
+#### .start()
+
+Listen for requests.
+
+#### .stop()
+
+Stop the proxy from listening.
 
 ## Contributing
 
