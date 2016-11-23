@@ -13,9 +13,9 @@ class PageProxy {
         const config = this.config = Object.assign(
             {
                 port          : 8000,
+                loaderFile    : path.join('config', 'loader.html'),
                 // Async configuration for constructors is a pain.
                 /* eslint-disable no-sync */
-                loaderFile    : path.join('config', 'loader.html'),
                 certAuthority : {
                     key  : fs.readFileSync(path.join(__dirname, 'lib', 'ca', 'key', 'proxy-ca.key')),
                     cert : fs.readFileSync(path.join(__dirname, 'lib', 'ca', 'cert', 'proxy-ca.cert'))
@@ -112,14 +112,16 @@ class PageProxy {
         const server = this._server;
         return new Promise((resolve, reject) => {
             const onError = (err) => {
+                const { port } = this.config;
+
                 if (err.code === 'EACCES') {
-                    err.message = `Insufficient privileges to run on port ${this.config.port}.`;
-                    if (!portType.haveRights()) {
+                    err.message = `Insufficient privileges to run on port ${port}.`;
+                    if (!portType.haveRights(port)) {
                         err.message += ' Using sudo may help.';
                     }
                 }
                 else if (err.code === 'EADDRINUSE') {
-                    err.message = `Port ${this.config.port} is already being used by someone.`;
+                    err.message = `Port ${port} is already being used by someone.`;
                 }
 
                 reject(err);
