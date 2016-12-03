@@ -66,7 +66,7 @@ $ proxy --branch=master
 Load a specific version.
 
 ```
-$ proxy --version=1.0.0
+$ proxy --build=1.0.0
 ```
 
 Imitate a specific customer.
