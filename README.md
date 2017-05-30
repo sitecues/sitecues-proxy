@@ -1,107 +1,150 @@
-# sitecues Proxy
+# sitecues-proxy [![Build status for sitecues-proxy on Circle CI.](https://img.shields.io/circleci/project/sitecues/sitecues-proxy/master.svg "Circle Build Status")](https://circleci.com/gh/sitecues/sitecues-proxy "Sitecues Proxy Builds")
 
-A web server that sits between you and a website, to add or remove sitecues.
+> Intercept webpages to add or remove Sitecues.
 
- - General testing
- - Code debugging
- - Quality assurance
+## Why?
 
-**Version**: `0.1.0`    
-**Documentation**: [The sitecues&reg; Proxy](https://equinox.atlassian.net/wiki/pages/viewpage.action?pageId=36241450 "Documentation for the sitecues Proxy.")    
-**Author**: [Seth Holladay](http://seth-holladay.com "Personal website for Seth Holladay.")
+ - Enables testing on potential and existing customer sites.
+ - Reliable simulation, happening at the network layer.
+ - Powerful and easy to use.
 
-## Installation
+## Install
 
-Download the project.
-````sh
-git clone git@bitbucket.org:ai_squared/sitecues-proxy.git
-````
+As a dependency:
 
-Move into its shiny new home.
-````sh
-cd sitecues-proxy
-````
+```sh
+npm install sitecues/sitecues-proxy --save
+```
 
-For convenience, so you may use the proxy from any directory, you probably want to put it in your [`$PATH`](http://www.linfo.org/path_env_var.html "Description of the PATH environment variable.").
-````sh
+As a project to work on:
+
+```sh
+git clone git@github.com:sitecues/sitecues-proxy.git &&
+cd sitecues-proxy &&
 npm link
-````
-
-Now you can run `sitecues-proxy` from anywhere on the command line. It is equivalent to `npm start` seen below, but that command only works inside of the project directory, because it is intentionally relative to the nearest [package.json](https://docs.nodejitsu.com/articles/getting-started/npm/what-is-the-file-package-json "Description of the package.json file.") in or above the current working directory.
+```
 
 ## Usage
-At the moment, all settings on the command line are given via environment variables. Don't confuse these with arguments, they have different syntax and (by convention) must be uppercase with underscores, like `A_CONSTANT`.
 
-If using the proxy programmatically by `require()`ing it, then you may pass an options object with camelCase properties, which will take precedence.
+```
+$ proxy --help
 
-Eventually, we will bake in a module to normalize all of this so you don't really have to care.
+  Usage
+    $ proxy
 
-Run the proxy on a desired port.
-````sh
-PORT=8888 npm start
-````
+  Option
+    --port <number>            Listen on a custom port for requests.
+    --open <url>               Open a URL in your browser.
+    --loader <string>          Code to inject into HTML responses.
+    --loaderFile <path>        Filepath to find a loader.
+    --loaderStrategy <string>  What to do with loaders.
+    --logLevel <level>         Amount of program info to output.
 
-Specify a hostname to associate the proxy with.
-````sh
-HOSTNAME=localhost npm start
-````
+  Example
+    $ proxy
+    The Sitecues® Proxy is on port 8000.
+    $ proxy --port=8888
+    The Sitecues® Proxy is on port 8888.
+```
 
-Specify a complete `host` to associate the proxy with. Takes precedence over the less specific `hostname` or `port`.
-````sh
-HOST=localhost:8000 npm start
-````
+Control how quiet or noisy the proxy logs are. Uses [npm levels](https://github.com/winstonjs/winston/blob/master/lib/winston/config/npm-config.js), possible values are `error`, `warn`, `info`, `verbose`, `debug`, `silly`.
 
-Control how quiet or noisy the proxy logs should be.
-````sh
-LOG_LEVEL=debug npm start
-````
+```
+$ proxy --logLevel=debug
+```
 
-Demand that the proxy log level be *at least* `verbose` (may be more noisy).
-````sh
-VERBOSE=true npm start
-````
+### Loader Options
 
-### sitecues Loader Options
+**The following options control the Sitecues loader added to pages. They do not control the proxy itself.**
 
-**The following options control the sitecues load script added to pages. They do not control the proxy itself.**
+Load a specific branch.
 
-Inject a specific branch.
-````sh
-BRANCH=x-newpanel npm start
-````
+```
+$ proxy --branch=master
+```
 
-Inject a specific release candidate, deployed by CI.
-````sh
-RELEASE=3.1.2 npm start
-````
+Load a specific version.
 
-Inject a specific development version, deployed by CI.
-````sh
-DEV_VERSION=32.673 npm start
-````
+```
+$ proxy --build=1.0.0
+```
 
-Load sitecues from the production servers.
-````sh
-PRODUCTION=true npm start
-````
+Imitate a specific customer.
 
-Set the string used to identify customer sites.
-````sh
-SITE_ID=0000ee0c npm start
-````
+```
+$ proxy --siteId=s-0000ee0c
+```
 
-## Contribution
-* Generally try to follow [Crockford conventions](http://javascript.crockford.com/code.html "Douglas Crockford's recommendations for JavaScript code style.").
-* Never commit directly to **master**.
-* Code must be reviewed by a previous contributor before pushing to or merging into **master**.
-* Must pass npm test before pushing to or merging into **master**.
+Load from a specific server.
 
-1. Create your feature branch: `git checkout -b my-new-feature`
+```
+$ proxy --jsHost=localhost
+```
+
+## API
+
+### Proxy(option)
+
+#### option
+
+Type: `object`
+
+Settings for the new proxy instance.
+
+##### port
+
+Type: `number`<br>
+Default: `8000`
+
+The port number to listen on for requests.
+
+##### loader
+
+Type: `string`
+
+A piece of code to inject into webpages. Takes precedence over `loaderFile`.
+
+##### loaderFile
+
+Type: `string`<br>
+Default: `config/loader.html`
+
+A filepath to find a loader, when `loader` is not provided.
+
+##### loaderStrategy
+
+Type: `string`<br>
+Default: `replace`
+
+What to do with loaders that are provided and ones that are encountered on webpages.
+
+| Strategy  | Description                                                    |
+|-----------|----------------------------------------------------------------|
+| `add`     | Always inject the provided loader, no matter what.             |
+| `remove`  | Simply remove any loaders on the page and do nothing else.     |
+| `keep`    | Inject the provided loader only if the page does not have one. |
+| `replace` | Ensure the page loads with only the provided loader.           |
+
+### Instance
+
+#### .start()
+
+Listen for requests.
+
+#### .stop()
+
+Stop the proxy from listening.
+
+## Contributing
+
+See our [contributing guidelines](https://github.com/sitecues/sitecues-proxy/blob/master/CONTRIBUTING.md "The guidelines for participating in this project.") for more details.
+
+1. [Fork it](https://github.com/sitecues/sitecues-proxy/fork).
+2. Make a feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
-5. [Submit a pull request](https://bitbucket.org/ai_squared/sitecues-proxy/pull-request/new "Submit your code to be merged in, pending a review.").
+5. [Submit a pull request](https://github.com/sitecues/sitecues-proxy/compare "Submit code to this project for review.").
 
 ## License
-[MPL-2.0](https://www.mozilla.org/MPL/2.0/ "The license for the sitecues Proxy.")
 
-Go make something, dang it.
+Copyright © [Sitecues](https://sitecues.com "Owner of sitecues-proxy."). All rights reserved.

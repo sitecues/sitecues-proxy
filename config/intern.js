@@ -1,46 +1,23 @@
-// Herein lies the base configuration for the testing framework.
-// Other files can use this as an AMD module.
+// This is the base configuration for the testing framework.
+// You can import and extend it for special use cases.
 
 define(
-    [
-        'intern',
-        '../test/all-unit',
-        '../test/all-functional'
-    ],
-    function (intern, allUnit, allFunctional) {
-
+    [],
+    () => {
         'use strict';
 
-        const
-            proxyPort = 9000,
-            // This path is relative to baseUrl.
-            testDir = '../../test/',
-            // Name of the alias to the unit suite directory.
-            UNIT_PKG = 'unit',
-            // Name of the alias to the functional suite directory.
-            FUNC_PKG = 'functional';
-
-        let build = 'UNKNOWN';
-
-        if (intern.args.build) {
-            build = intern.args.build;
-        }
-
-        // Make sure we are in Node and not a browser.
-        else if (typeof process === 'object' && process && process.env) {
-            build = process.env.BUILD || process.env.COMMIT;
-        }
+        const proxyPort = 9000;
+        // This path is relative to baseUrl.
+        const testDir = '../../test/';
+        // Name of the alias to the unit suite directory.
+        const unitPkg = 'unit';
+        // Name of the alias to the functional suite directory.
+        const funcPkg = 'functional';
 
         return {
             proxyPort,
             proxyUrl : `http://localhost:${proxyPort}/`,
 
-            // Miscellaneous configuration, mainly for Selenium.
-            // Examples: https://code.google.com/p/selenium/wiki/DesiredCapabilities
-            capabilities : {
-                name : 'Automated Test - sitecues-proxy',
-                build
-            },
             // Places where unit and/or functional tests will be run.
             environments : [
                 // { browserName : 'safari' },
@@ -49,43 +26,47 @@ define(
             ],
 
             // How many browsers may be open at once.
-            maxConcurrency : 3,
+            maxConcurrency : 1,
 
-            // Specify which AMD module loader to use.
+            // Use a custom AMD module loader.
             // loaders : {
-
-            // }
-            // Options to pass to the AMD module loader.
+            //
+            // },
+            // Configure the AMD module loader.
             loaderOptions : {
                 packages : [
-                    { name : UNIT_PKG, location : `${testDir}unit` },
-                    { name : FUNC_PKG, location : `${testDir}functional` }
+                    {
+                        name     : unitPkg,
+                        location : testDir + 'unit'
+                    },
+                    {
+                        name     : funcPkg,
+                        location : testDir + 'functional'
+                    }
                 ]
             },
 
-            // Which type of WebDriver session to create.
-            tunnel : 'NullTunnel',
+            // The provider for a WebDriver server.
+            // tunnel : 'NullTunnel',  // no tunnel (default, if none provided)
 
             tunnelOptions : {
                 // Custom location to find the WebDriver server.
                 host : 'localhost:4447'
-                // Extra logging, only supported by BrowserStack.
-                // verbose : true
             },
 
             // Which unit test suite files to load. These test our APIs.
-            suites : allUnit.map((suite) => {
-                return `${UNIT_PKG}/${suite}`;
-            }),
+            suites : [
+                unitPkg + '/**/*.js'
+            ],
             // Which functional test suite files to load. These test our
             // user-facing behavior.
-            functionalSuites : allFunctional.map((suite) => {
-                return `${FUNC_PKG}/${suite}`;
-            }),
+            functionalSuites : [
+                funcPkg + '/**/*.js'
+            ],
 
             // Test whitelist, matched against "suite name - test name".
             // Everything else will be skipped.
-            grep : /.*/,
+            // grep : /.*/,
 
             // Ignore some code for test coverage reports, even if it loads
             // during testing. The paths that match this pattern will NOT
